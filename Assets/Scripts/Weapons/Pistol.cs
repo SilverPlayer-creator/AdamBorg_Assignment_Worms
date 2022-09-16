@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerController))]
 public class Pistol : MonoBehaviour
 {
     [SerializeField] private GameObject _projectilePrefab;
@@ -15,7 +16,7 @@ public class Pistol : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.V))
+        if (Input.GetKeyDown(KeyCode.V) && GetComponent<PlayerController>().IsActivePlayer)
         {
             GameObject newProjectile = Instantiate(_projectilePrefab);
             newProjectile.transform.position = _barrel.position;
