@@ -19,10 +19,10 @@ public class PlayerController : MonoBehaviour
     private Vector3 _playerVelocity;
 
     [Header("Grounded Check")]
+    [SerializeField] private Transform _groundCheck;
     [SerializeField] private float checkRadius;
     [SerializeField] private float checkOffset;
     [SerializeField] private LayerMask _platform;
-    [SerializeField] private float _fallSpeed;
     private bool _isGrounded;
 
     [Header("Active")]
@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         PickupManager.GetInstance();
+        _controller.Move(Vector3.zero);
     }
 
     // Update is called once per frame
@@ -60,57 +61,58 @@ public class PlayerController : MonoBehaviour
            
         
     }
-    private bool IsGrounded()
+    public void PlayerJump(bool pressed)
     {
-        Vector3 pos = new Vector3(transform.position.x, transform.position.y - checkOffset, transform.position.z);
-        //RaycastHit hit;
-        //return Physics.SphereCast(transform.position, checkRadius, -transform.up, out hit, checkOffset, platform);
-        return Physics.CheckSphere(transform.position, checkRadius, (int)_platform);
-    }
-    public void PlayerJump()
-    {
-        _pressedJump = true;
+        _pressedJump = pressed;
     }
     public void Jump(InputAction.CallbackContext context)
     {
         //Debug.Log("Jump function reached");
         if (context.phase == InputActionPhase.Performed)
         {
-            PlayerJump();
+            PlayerJump(true);
         }
+        else if (context.phase == InputActionPhase.Canceled)
+        {
+            PlayerJump(false);
+        }
+    }
+    private bool IsGrounded()
+    {
+        return Physics.CheckSphere(_groundCheck.position, checkRadius, _platform);
     }
     private void FixedUpdate()
     {
         if (_isActivePlayer)
         {
-            Vector3 combined = ((transform.forward * _moveValue.y) + (transform.right * _moveValue.x)).normalized;
+            Vector3 move = ((transform.forward * _moveValue.y) + (transform.right * _moveValue.x)).normalized;
 
             transform.Rotate(new Vector3(0, _rotateValue * _rotateSpeed, 0));
 
-            if (_pressedJump && _controller.isGrounded)
+            if(IsGrounded() && _playerVelocity.y < 0)
             {
-                combined.y += _jumpForce * Time.fixedDeltaTime;
-                _pressedJump = false;
+                _playerVelocity.y = -2f;
+                Debug.Log("Apply gravity");
             }
 
-            combined.y += _gravity * Time.fixedDeltaTime;
-            _controller.Move(combined * _moveSpeed * Time.fixedDeltaTime);
+            if(IsGrounded() && _pressedJump)
+            {
+                Debug.Log("Player should jump");
+                _playerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
+            }
+            else if(IsGrounded() && !_pressedJump)
+            {
+                Debug.LogError("Player is grounded, jump input not registered");
+            }
+            else if(!IsGrounded() && _pressedJump)
+            {
+                Debug.LogError("Jump input registered, player is not grounded");
+            }
+    
+            _playerVelocity.y += _gravity * Time.fixedDeltaTime;
+            _controller.Move(_playerVelocity * Time.fixedDeltaTime);
+            _controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
         }
-    }
-    Vector3 VelocityY()
-    {
-        Vector3 verticalVelocity = new Vector3(0, _controller.velocity.y, 0);
-        if (IsGrounded() && _pressedJump)
-        {
-            verticalVelocity.y = _jumpForce;
-            _pressedJump = false;
-        }
-        else if (!IsGrounded())
-        {
-            //Debug.Log(verticalVelocity.y);
-            verticalVelocity += (Vector3.up * Physics.gravity.y) * Time.fixedDeltaTime;
-        }
-        return verticalVelocity;
     }
     public void MovePlayer(InputAction.CallbackContext context)
     {
