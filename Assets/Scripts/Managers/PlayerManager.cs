@@ -27,7 +27,7 @@ public class PlayerManager : MonoBehaviour
         for (int i = 0; i < _players.Count; i++)
         {
             _playerAmount++;
-            _players[i].UpdateIsActivePlayer(i == 0);
+            _players[i].GetComponent<PlayerActive>().UpdateIsActivePlayer(i == 0);
         }
     }
     private void Update()
@@ -48,7 +48,7 @@ public class PlayerManager : MonoBehaviour
     }
     public void PlayerEndedTurn()
     {
-        _players[_currentPlayerIndex].UpdateIsActivePlayer(false);
+        _players[_currentPlayerIndex].GetComponent<PlayerActive>().UpdateIsActivePlayer(false);
         if (_currentPlayerIndex < _playerAmount - 1)
         {
             _currentPlayerIndex++;
@@ -58,6 +58,6 @@ public class PlayerManager : MonoBehaviour
         {
             _currentPlayerIndex = 0;
         }
-        _players[_currentPlayerIndex].UpdateIsActivePlayer(true);
+        _players[_currentPlayerIndex].GetComponent<PlayerActive>().UpdateIsActivePlayer(true);
     }
 }
