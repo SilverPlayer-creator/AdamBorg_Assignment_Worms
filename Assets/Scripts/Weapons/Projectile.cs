@@ -12,23 +12,6 @@ public class Projectile : MonoBehaviour
     {
         _body = GetComponent<Rigidbody>();
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (_isActive)
-        {
-            //transform.Translate(transform.forward * _speed * Time.deltaTime);
-            //_body.MovePosition(transform.position + transform.forward * _speed * Time.deltaTime);
-
-            
-        } 
-    }
     public void Initialize(Transform _forward)
     {
         _isActive = true;
@@ -40,7 +23,7 @@ public class Projectile : MonoBehaviour
         IDamageable damageableObject = collisionObject.GetComponent<IDamageable>();
         if(damageableObject != null)
         {
-            damageableObject.TakeDamage(0);
+            damageableObject.TakeDamage(5);
         }
         Destroy(gameObject);
     }

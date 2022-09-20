@@ -2,14 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerController))]
 public class PlayerActive : MonoBehaviour
 {
-    private PlayerController _controller;
-    public void Awake()
-    {
-        _controller = GetComponent<PlayerController>();
-    }
     [Header("Active")]
     [SerializeField] private int _playerIndex;
     [SerializeField] private Camera _playerCamera;

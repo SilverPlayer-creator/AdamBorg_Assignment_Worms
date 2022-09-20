@@ -10,7 +10,7 @@ public class Grenades : MonoBehaviour
     [SerializeField] private float _timer;
     [SerializeField] private float _explosionRadius;
     [SerializeField] private LayerMask _playerLayer;
-    private PlayerInput _thrownPlayer;
+    private PlayerUnit _thrownPlayer;
     private void Awake()
     {
         _body = GetComponent<Rigidbody>();
@@ -32,15 +32,15 @@ public class Grenades : MonoBehaviour
                     player.TakeDamage(_damage);
                 }
             }
-            _thrownPlayer.GetComponent<PlayerMove>().CanMove(true);
+            _thrownPlayer.CanMove(true);
             Destroy(gameObject);
         }
     }
-    public void Initialize(PlayerInput player)
+    public void Initialize(PlayerUnit player)
     {
         _body.AddForce((transform.forward + transform.up) * _throwForce);
         _thrownPlayer = player;
-        _thrownPlayer.GetComponent<PlayerMove>().CanMove(false);
+        _thrownPlayer.CanMove(false);
     }
     private void OnDrawGizmos()
     {

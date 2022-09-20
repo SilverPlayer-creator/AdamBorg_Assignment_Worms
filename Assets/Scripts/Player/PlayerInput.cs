@@ -67,7 +67,7 @@ public class PlayerInput : MonoBehaviour
     {
         if(context.phase == InputActionPhase.Performed && GetComponent<PlayerActive>().IsActivePlayer)
         {
-            GetComponent<GrenadeThrow>().Throw(this);
+            //GetComponent<GrenadeThrow>().Throw(this);
         }
     }
 }

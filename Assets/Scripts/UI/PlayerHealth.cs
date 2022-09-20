@@ -8,11 +8,12 @@ public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _healthText;
     [SerializeField] private TextMeshProUGUI _ammoText;
+    [SerializeField] private int _index;
     
     // Start is called before the first frame update
     void Start()
     {
-        PlayerStats.OnDamageEvent += UpdateHealth;
+        PlayerUnit.OnDamageEvent += UpdateHealth;
         Weapon.OnAmmoChangedEvent += UpdateAmmo;
     }
 
@@ -21,8 +22,9 @@ public class PlayerHealth : MonoBehaviour
     {
         
     }
-    void UpdateHealth(int currentHealth)
+    void UpdateHealth(int currentHealth, int index)
     {
+        if(index == _index)
         _healthText.text = currentHealth.ToString();
     }
     void UpdateAmmo(int currentAmmo)

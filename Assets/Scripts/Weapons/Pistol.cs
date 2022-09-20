@@ -24,7 +24,7 @@ public class Pistol : Weapon
     }
     public override void Shoot()
     {
-        if (GetComponent<PlayerActive>().IsActivePlayer)
+        if (GetComponent<PlayerUnit>().IsActivePlayer)
         {
             if (_currentAmmo > 0)
             {
