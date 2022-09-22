@@ -16,19 +16,14 @@ public class PlayerHealth : MonoBehaviour
         PlayerUnit.OnDamageEvent += UpdateHealth;
         Weapon.OnAmmoChangedEvent += UpdateAmmo;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     void UpdateHealth(int currentHealth, int index)
     {
         if(index == _index)
         _healthText.text = currentHealth.ToString();
     }
-    void UpdateAmmo(int currentAmmo)
+    void UpdateAmmo(int currentAmmo, int maxAmmo, int index)
     {
-        _ammoText.text = currentAmmo.ToString();
+        if(index == _index)
+        _ammoText.text = currentAmmo.ToString() + "/" + maxAmmo.ToString();
     }
 }

@@ -13,7 +13,7 @@ public class Pistol : Weapon
         {
             if (Time.time >= _nextShootTime)
             {
-                Shoot();
+                //Shoot();
                 _nextShootTime = Time.time + 1 / _shootRate;
             }
         }
@@ -22,24 +22,22 @@ public class Pistol : Weapon
     {
         _isShooting = isShooting;
     }
-    public override void Shoot()
-    {
-        if (GetComponent<PlayerUnit>().IsActivePlayer)
-        {
-            if (_currentAmmo > 0)
-            {
-                GameObject newProjectile = Instantiate(_projectilePrefab);
-                newProjectile.transform.position = _barrel.position;
-                newProjectile.GetComponent<Projectile>().Initialize(_barrel);
-                _currentAmmo--;
-                //OnAmmoChangedEvent?.Invoke(_currentAmmo);
-                //EventInvoke();
-                Debug.Log("Current ammo: " + _currentAmmo);
-            }
-            else
-            {
-                Reload();
-            }
-        }
-    }
+    //public override void Shoot()
+    //{
+    //        if (_currentAmmo > 0)
+    //        {
+    //            _currentAmmo--;
+    //            base.Shoot();
+    //            GameObject newProjectile = Instantiate(_projectilePrefab);
+    //            newProjectile.transform.position = _barrel.position;
+    //            newProjectile.GetComponent<Projectile>().Initialize(_barrel);
+    //            //OnAmmoChangedEvent?.Invoke(_currentAmmo);
+    //            //EventInvoke();
+    //            //Debug.Log("Current ammo: " + _currentAmmo);
+    //        }
+    //        else
+    //        {
+    //            Reload(_index);
+    //        }
+    //}
 }

@@ -10,6 +10,6 @@ public class GrenadeThrow : MonoBehaviour
     public void Throw(PlayerUnit player)
     {
         Grenades newGrenade = Instantiate(_grenadePrefab, _spawnPoint.position, Quaternion.identity);
-        newGrenade.Initialize(player);
+        //newGrenade.Initialize(player);
     }
 }

@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public class Rocket : MonoBehaviour
 {
     [SerializeField] private float _speed;
     private Rigidbody _body;
-    [SerializeField] private GameObject _prefab;
 
     private bool _isActive;
     private void Awake()
