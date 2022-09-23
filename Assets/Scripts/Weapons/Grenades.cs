@@ -34,7 +34,6 @@ public class Grenades : MonoBehaviour
                 if(player != null && !hitPlayers.Contains(player))
                 {
                     Debug.Log("Found player");
-                    player.TakeDamage(_damage);
                     hitPlayers.Add(player);
                 }
             }

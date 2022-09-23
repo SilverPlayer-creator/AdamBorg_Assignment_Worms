@@ -21,29 +21,29 @@ public class PlayerMove : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (GetComponent<PlayerActive>().IsActivePlayer)
-        {
-            if (_canMove)
-            {
-                Vector3 move = ((transform.forward * _input.MoveValue.y) + (transform.right * _input.MoveValue.x)).normalized;
+        //if (GetComponent<PlayerActive>().IsActivePlayer)
+        //{
+        //    if (_canMove)
+        //    {
+        //        Vector3 move = ((transform.forward * _input.MoveValue.y) + (transform.right * _input.MoveValue.x)).normalized;
 
-                transform.Rotate(new Vector3(0, _input.RotateValue * _input.RotateSpeed, 0));
+        //        transform.Rotate(new Vector3(0, _input.RotateValue * _input.RotateSpeed, 0));
 
-                if (_groundCheck.IsGrounded() && _playerVelocity.y < 0)
-                {
-                    _playerVelocity.y = -2f;
-                }
+        //        if (_groundCheck.IsGrounded() && _playerVelocity.y < 0)
+        //        {
+        //            _playerVelocity.y = -2f;
+        //        }
 
-                if (_groundCheck.IsGrounded() && _input.PressedJump)
-                {
-                    Debug.Log("Player should jump");
-                    _playerVelocity.y = Mathf.Sqrt(_stats.JumpForce * -2 * _gravity);
-                }
+        //        if (_groundCheck.IsGrounded() && _input.PressedJump)
+        //        {
+        //            Debug.Log("Player should jump");
+        //            _playerVelocity.y = Mathf.Sqrt(_stats.JumpForce * -2 * _gravity);
+        //        }
 
-                _playerVelocity.y += _gravity * Time.fixedDeltaTime;
-                _controller.Move(move * _stats.MoveSpeed * Time.fixedDeltaTime);
-            }
-        }
+        //        _playerVelocity.y += _gravity * Time.fixedDeltaTime;
+        //        _controller.Move(move * _stats.MoveSpeed * Time.fixedDeltaTime);
+        //    }
+        //}
         _controller.Move(_playerVelocity * Time.fixedDeltaTime);
     }
     public void CanMove(bool canMove)

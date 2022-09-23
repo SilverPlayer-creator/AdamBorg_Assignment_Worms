@@ -65,9 +65,9 @@ public class PlayerInput : MonoBehaviour
     }
     public void AltFire(InputAction.CallbackContext context)
     {
-        if(context.phase == InputActionPhase.Performed && GetComponent<PlayerActive>().IsActivePlayer)
-        {
-            //GetComponent<GrenadeThrow>().Throw(this);
-        }
+        //if(context.phase == InputActionPhase.Performed && GetComponent<PlayerActive>().IsActivePlayer)
+        //{
+        //    //GetComponent<GrenadeThrow>().Throw(this);
+        //}
     }
 }

@@ -6,15 +6,12 @@ public class Rocket : MonoBehaviour
 {
     [SerializeField] private float _speed;
     private Rigidbody _body;
-
-    private bool _isActive;
     private void Awake()
     {
         _body = GetComponent<Rigidbody>();
     }
     public void Initialize(Transform _forward)
     {
-        _isActive = true;
         _body.AddForce((_forward.forward + transform.up) * 200f);
     }
     private void OnCollisionEnter(Collision collision)

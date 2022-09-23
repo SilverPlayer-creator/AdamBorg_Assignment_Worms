@@ -38,16 +38,16 @@ public class Weapon : MonoBehaviour
 
     public virtual void Initialize(int index, Transform barrel)
     {
-        Debug.Log("Initialize");
-        _weaponName = _data._weaponName;
-        gameObject.name = _weaponName;
-        _maxAmmo = _data._maxAmmo;
-        _currentAmmo = _maxAmmo;
-        _shootRate = _data._shootRate;
-        _isAutomatic = _data._isAutomatic;
-        _index = index;
-        _barrel = barrel;
-        EventInvoke();
+        //Debug.Log("Initialize");
+        //_weaponName = _data._weaponName;
+        //gameObject.name = _weaponName;
+        //_maxAmmo = _data._maxAmmo;
+        //_currentAmmo = _maxAmmo;
+        //_shootRate = _data._shootRate;
+        //_isAutomatic = _data._isAutomatic;
+        //_index = index;
+        //_barrel = barrel;
+        //EventInvoke();
     }
     public virtual void Shoot(Transform barrel) 
     {

@@ -69,17 +69,6 @@ public class WeaponHolder : MonoBehaviour
     }
     void SwitchWeapon()
     {
-        int i = 0;
-        foreach (Weapon weapon in _heldWeapons)
-        {
-            if(i == _weaponIndex)
-            {
-                _selectedWeapon = _heldWeapons[i];
-            }
-            else
-            {
-
-            }
-        }
+        
     }
 }

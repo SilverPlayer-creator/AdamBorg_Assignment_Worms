@@ -13,13 +13,13 @@ public class PlayerHealth : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerUnit.OnDamageEvent += UpdateHealth;
+        //PlayerUnit.OnDamageEvent += UpdateHealth;
         Weapon.OnAmmoChangedEvent += UpdateAmmo;
     }
     void UpdateHealth(int currentHealth, int index)
     {
-        if(index == _index)
-        _healthText.text = currentHealth.ToString();
+        //if(index == _index)
+        //_healthText.text = currentHealth.ToString();
     }
     void UpdateAmmo(int currentAmmo, int maxAmmo, int index)
     {

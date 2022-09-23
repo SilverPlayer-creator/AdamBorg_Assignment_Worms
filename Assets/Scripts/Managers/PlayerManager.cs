@@ -6,9 +6,12 @@ public class PlayerManager : MonoBehaviour
 {
     private static PlayerManager _instance;
     private int _currentPlayerIndex;
-    [SerializeField] private List<PlayerUnit> _players;
+    [SerializeField] private List<ActivePlayer> _players;
+    [SerializeField] private Camera[] _playerCameras;
+    private List<ActivePlayer> _activePlayers;
     private int _amountOfPlayers;
-    [SerializeField] private Camera _mainCamera;
+
+    private ActivePlayer _currentPlayer;
     private void Awake()
     {
         if (_instance == null)
@@ -20,27 +23,21 @@ public class PlayerManager : MonoBehaviour
             Destroy(this);
         }
         _currentPlayerIndex = 0;
+        _currentPlayer = _players[0];
         _amountOfPlayers = PlayerPrefs.GetInt("PlayerAmount");
+        _activePlayers = new List<ActivePlayer>();
 
         //WHAT I WANT
         //Go through all the controllers
         //Check if the amount of controllers match the amount of people that want to play
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < _amountOfPlayers; i++)
         {
+            if(i<= _amountOfPlayers -1)
+            _activePlayers.Add(_players[i]);
+
             if(i > _amountOfPlayers-1)
             _players[i].gameObject.SetActive(false);
         }
-        for (int i = 0; i < _amountOfPlayers; i++)
-        {
-            //Debug.Log("Activate players");
-            _players[i].ChangeInput(i == 0);
-            _players[i].UpdateIsActivePlayer(i == 0);
-            _players[0].CanDoActions();
-        }
-    }
-    private void Start()
-    {
-        
     }
     private void Update()
     {
@@ -48,32 +45,57 @@ public class PlayerManager : MonoBehaviour
         {
             PlayerEndedTurn();
         }
-    }
-    private void FixedUpdate()
-    {
-        
+        for (int i = 0; i < _activePlayers.Count; i++)
+        {
+            //_activePlayers[i].GetComponent<>
+        }
     }
     public static PlayerManager GetInstance()
     {
         return _instance;
     }
+    public ActivePlayer GetCurrentPlayer()
+    {
+        return _currentPlayer;
+    }
     public void PlayerEndedTurn()
     {
-        Debug.Log("End current turn for player " + (_currentPlayerIndex+1));
-        _players[_currentPlayerIndex].UpdateIsActivePlayer(false);
-        if (_currentPlayerIndex < _amountOfPlayers - 1)
+        //Debug.Log("End current turn for player " + (_currentPlayerIndex+1));
+        //_players[_currentPlayerIndex].UpdateIsActivePlayer(false);
+        //if (_currentPlayerIndex < _amountOfPlayers - 1)
+        //{
+        //    _currentPlayerIndex++;
+        //    //Debug.Log("Increase player index to " + _currentPlayerIndex);
+        //}
+        //else
+        //{
+        //    _currentPlayerIndex = 0;
+        //}
+        //_players[_currentPlayerIndex].UpdateIsActivePlayer(true);
+        //_players[_currentPlayerIndex].CanDoActions();
+        //_players[_currentPlayerIndex].ChangeInput(true);
+
+
+        if(_currentPlayerIndex < _amountOfPlayers - 1)
         {
             _currentPlayerIndex++;
-            //Debug.Log("Increase player index to " + _currentPlayerIndex);
         }
         else
         {
             _currentPlayerIndex = 0;
         }
-        _players[_currentPlayerIndex].UpdateIsActivePlayer(true);
-        _players[_currentPlayerIndex].CanDoActions();
-        _players[_currentPlayerIndex].ChangeInput(true);
-
+        _currentPlayer = _activePlayers[_currentPlayerIndex];
+        for (int i = 0; i < _activePlayers.Count; i++)
+        {
+            if(i != _currentPlayerIndex)
+            {
+                _playerCameras[i].depth = 0;
+            }
+            else
+            {
+                _playerCameras[i].depth = 1;
+            }
+        }
     }
     public void PlayerKilled()
     {
@@ -84,5 +106,9 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("End turn");
         yield return new WaitForSeconds(0.5f);
         PlayerEndedTurn();
+    }
+    public List<ActivePlayer> GetAllPlayers()
+    {
+        return _activePlayers;
     }
 }

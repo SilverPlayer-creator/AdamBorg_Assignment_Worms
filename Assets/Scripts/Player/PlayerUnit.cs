@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerUnit : MonoBehaviour, IDamageable
+public class PlayerUnit : MonoBehaviour
 {
     [SerializeField] private UnityEngine.InputSystem.PlayerInput _input;
     //Movement Input
@@ -39,12 +39,6 @@ public class PlayerUnit : MonoBehaviour, IDamageable
     private float _totalDistanceMoved;
     private Vector3 _lastPosition;
 
-    [Header("Grounded Check")]
-    [SerializeField] private Transform _groundCheck;
-    [SerializeField] private float checkRadius;
-    [SerializeField] private float checkOffset;
-    [SerializeField] private LayerMask _platform;
-
     [Header("Weapon")]
     [SerializeField] private WeaponHolder _weaponHolder;
     public WeaponHolder WeaponHolder
@@ -55,14 +49,6 @@ public class PlayerUnit : MonoBehaviour, IDamageable
     [SerializeField] private int _maxGrenadeAmount;
     [SerializeField] private Grenades _grenadePrefab;
     private bool _canPerformActions;
-
-    //Player stats
-    [Header("Stats")]
-    [SerializeField] private int _maxHealth;
-    private int _currentHealth;
-
-    public static event OnTakeDamage OnDamageEvent;
-    public delegate void OnTakeDamage(int currentHealth, int index);
 
     [Header("Active")]
     [SerializeField] private int _playerIndex;
@@ -81,7 +67,6 @@ public class PlayerUnit : MonoBehaviour, IDamageable
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
-        _currentHealth = _maxHealth;
         _lastPosition = transform.position;
     }
 
@@ -95,16 +80,16 @@ public class PlayerUnit : MonoBehaviour, IDamageable
 
                 transform.Rotate(new Vector3(0, _rotateValue * _rotateSpeed, 0));
 
-                if (IsGrounded() && _playerVelocity.y < 0)
-                {
-                    _playerVelocity.y = -2f;
-                }
+                //if (IsGrounded() && _playerVelocity.y < 0)
+                //{
+                //    _playerVelocity.y = -2f;
+                //}
 
-                if (IsGrounded() && PressedJump)
-                {
-                    //Debug.Log("Player should jump");
-                    _playerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
-                }
+                //if (IsGrounded() && PressedJump)
+                //{
+                //    //Debug.Log("Player should jump");
+                //    _playerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
+                //}
                 _controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
             }
         }
@@ -118,10 +103,9 @@ public class PlayerUnit : MonoBehaviour, IDamageable
         if (_totalDistanceMoved >= _maxMovementRange)
         {
             transform.position = _lastPosition;
-            PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
             _canMove = false;
+            PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
             _totalDistanceMoved = 0;
-            //PlayerManager.GetInstance().PlayerEndedTurn();
         }
     }
     public void MovePlayer(InputAction.CallbackContext context)
@@ -131,22 +115,6 @@ public class PlayerUnit : MonoBehaviour, IDamageable
     public void RotatePlayer(InputAction.CallbackContext context)
     {
         _rotateValue = context.ReadValue<float>();
-    }
-    public void Jump(InputAction.CallbackContext context)
-    {
-        //Debug.Log("Jump function reached");
-        if (context.phase == InputActionPhase.Performed)
-        {
-            _pressedJump = true;
-        }
-        else if (context.phase == InputActionPhase.Canceled)
-        {
-            _pressedJump = false;
-        }
-    }
-    public bool IsGrounded()
-    {
-        return Physics.CheckSphere(_groundCheck.position, checkRadius, _platform);
     }
     public void Fire(InputAction.CallbackContext context)
     {
@@ -193,13 +161,6 @@ public class PlayerUnit : MonoBehaviour, IDamageable
         _playerCamera.enabled = isActive;
         _canMove = isActive;
         _totalDistanceMoved = 0;
-    }
-    public void TakeDamage(int damage)
-    {
-        Debug.Log("Damage");
-        _currentHealth -= damage;
-        OnDamageEvent?.Invoke(_currentHealth, _playerIndex);
-        Debug.Log("Invoke damage");
     }
     public void CanMove(bool canMove)
     {

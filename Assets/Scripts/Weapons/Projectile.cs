@@ -8,15 +8,13 @@ public class Projectile : MonoBehaviour
     private Rigidbody _body;
     [SerializeField] private GameObject _prefab;
 
-    private bool _isActive;
     private void Awake()
     {
         _body = GetComponent<Rigidbody>();
     }
-    public void Initialize(Transform _forward)
+    public void Initialize(Transform forward)
     {
-        _isActive = true;
-        _body.AddForce((_forward.forward + transform.up) * 200f);
+        _body.AddForce((forward.forward + transform.up) * 200f);
     }
     private void OnCollisionEnter(Collision collision)
     {
