@@ -7,12 +7,8 @@ public class PlayerHeldWeapons : MonoBehaviour
     private List<PickupWeapon> _heldWeapons;
     private PickupWeapon _selectedWeapon;
     private bool _holdingFire;
-    [SerializeField] private Transform _barrel;
     [SerializeField] private GameObject _projectile;
     [SerializeField] private float _fireRate;
-    private float _nextShootTime;
-    private bool _isAutomatic = true;
-    private bool _isActivePlayer;
 
     [SerializeField] private PickupWeapon _defaultWeapon;
 
@@ -22,23 +18,21 @@ public class PlayerHeldWeapons : MonoBehaviour
     }
     private void Update()
     {
+        //Debug.Log(transform.name + " holding fire: " + _holdingFire);
         //Debug.Log(_holdingFire);
-        if(_holdingFire && _isActivePlayer)
+        if(_selectedWeapon.WeaponIsAutomatic() && _holdingFire)
         {
-            _selectedWeapon.Shoot(_barrel);
-            //Debug.Log("Shoot");
+            //_selectedWeapon.IsHoldingFire(_holdingFire);
+            //_selectedWeapon.Shoot();
+            Debug.Log(transform.name + " is shooting");
         }
     }
-    public void HoldingFire(bool holdingFire, bool isActivePlayer)
+    public void HoldingFire(bool holdingFire)
     {
         _holdingFire = holdingFire;
-        _isActivePlayer = isActivePlayer;
     }
-    void Shoot()
+    public void Shoot()
     {
-        GameObject bullet = Instantiate(_projectile, _barrel.position, Quaternion.identity);
-        Rigidbody body = bullet.GetComponent<Rigidbody>();
-        body.AddForce(_barrel.transform.forward * 200);
-        _nextShootTime = Time.time + 1f / _fireRate;
+        _selectedWeapon.Shoot();
     }
 }

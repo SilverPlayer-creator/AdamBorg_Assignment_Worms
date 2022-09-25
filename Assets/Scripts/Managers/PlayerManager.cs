@@ -25,18 +25,26 @@ public class PlayerManager : MonoBehaviour
         _currentPlayerIndex = 0;
         _currentPlayer = _players[0];
         _amountOfPlayers = PlayerPrefs.GetInt("PlayerAmount");
+        Debug.Log("Amount of players: " + _amountOfPlayers);
         _activePlayers = new List<ActivePlayer>();
 
         //WHAT I WANT
         //Go through all the controllers
         //Check if the amount of controllers match the amount of people that want to play
-        for (int i = 0; i < _amountOfPlayers; i++)
+        for (int i = 0; i < 4; i++)
         {
-            if(i<= _amountOfPlayers -1)
-            _activePlayers.Add(_players[i]);
+            if(i <= _amountOfPlayers - 1)
+            {
+                _activePlayers.Add(_players[i]);
+                Debug.Log("Add player " + (i+1) + " to active players.");
+            }
 
-            if(i > _amountOfPlayers-1)
-            _players[i].gameObject.SetActive(false);
+            if(i > _amountOfPlayers - 1)
+            {
+                _players[i].gameObject.SetActive(false);
+                Debug.Log("Set player " + (i + 1) + " to false");
+            }
+
         }
     }
     private void Update()

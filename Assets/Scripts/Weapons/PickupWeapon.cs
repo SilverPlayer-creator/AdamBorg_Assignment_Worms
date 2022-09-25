@@ -11,16 +11,9 @@ public class PickupWeapon : MonoBehaviour
     private int _maxAmmo;
     private int _currentAmmo;
     private float _fireRate;
-    public float FireRate
-    {
-        get { return _fireRate; }
-    }
     private float _nextShootTime;
     private bool _isAutomatic;
-    public bool IsAutomatic
-    {
-        get { return _isAutomatic; }
-    }
+    private bool _holdingFire;
     private int _force;
     [SerializeField] private Transform _barrel;
     [SerializeField]private GameObject _prefab;
@@ -37,8 +30,18 @@ public class PickupWeapon : MonoBehaviour
         name = _data.WeaponName;
         _image = _data.Icon;
         _isAutomatic = _data.IsAutomatic;
-
-        _nextShootTime = 0;
+    }
+    private void Update()
+    {
+        //Debug.Log(_holdingFire);
+        if(_isAutomatic && _holdingFire) //something wrong with holding fire bool, criteria not met
+        {
+            Debug.Log("Holding fire");
+            if (Time.time >= _nextShootTime)
+            {
+                //Shoot();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -47,7 +50,7 @@ public class PickupWeapon : MonoBehaviour
         if (player != null) 
         {
             //player.NewWeapon(this);
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
         }
     }
     public string GetWeaponName()
@@ -58,13 +61,24 @@ public class PickupWeapon : MonoBehaviour
     {
         return _image;
     }
-    public void Shoot(Transform barrel)
+    public void Shoot()
     {
-        Debug.Log("Shoot");
+        Debug.Log("Barrel position: " + _barrel.position);
+        GameObject bullet = Instantiate(_prefab, _barrel.position, transform.rotation);
+        bullet.AddComponent<WeaponProjectile>();
+        bullet.GetComponent<WeaponProjectile>().Initialize(_damage);
+        Debug.Log("Bullet instantiates at: " + bullet.transform.position);
+        Rigidbody body = bullet.GetComponent<Rigidbody>();
+        body.AddForce(transform.forward * _force);
 
-            GameObject bullet = Instantiate(_prefab, _barrel.position, Quaternion.identity);
-            Rigidbody body = bullet.GetComponent<Rigidbody>();
-            body.AddForce(transform.forward * _force);
-
+    }
+    public void IsHoldingFire(bool isHoldingFire)
+    {
+        //Debug.Log("Is holding fire: " + _holdingFire);
+        _holdingFire = isHoldingFire;
+    }
+    public bool WeaponIsAutomatic()
+    {
+        return _data.IsAutomatic;
     }
 }
