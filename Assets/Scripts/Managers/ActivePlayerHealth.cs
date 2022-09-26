@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using TMPro;
 
 public class ActivePlayerHealth : MonoBehaviour, IDamageable
@@ -9,11 +11,13 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     [SerializeField] private int _maxHealth;
     private int _currentHealth;
     [SerializeField] private Image _healthBar;
-    [SerializeField] private TextMeshProUGUI _text;
+    [SerializeField] private PlayerManager _manager;
+    public event Action OnEnemyDied;
     void Start()
     {
         _currentHealth = _maxHealth;
         _healthBar.fillAmount = 1;
+        _currentHealth = _maxHealth;
     }
     public void TakeDamage(int damage)
     {
@@ -26,6 +30,7 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     }
     void Die()
     {
-
+        //OnEnemyDied?.Invoke();
+        PlayerManager.GetInstance().RemovePlayer(this);
     }
 }

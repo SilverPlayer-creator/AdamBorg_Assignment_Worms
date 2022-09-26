@@ -15,8 +15,8 @@ MonoBehaviour:
   Damage: 40
   MaxAmmo: 1
   WeaponName: Rocket
-  ShootRate: 1
+  ShootRate: 0
   IsAutomatic: 0
-  Force: 100
+  Force: 2000
   Prefab: {fileID: 7915536112683913991, guid: 0e05624b3d6539944957d79458eba713, type: 3}
   Icon: {fileID: 21300000, guid: 4468b04f16464a04e83918339b7cdb69, type: 3}

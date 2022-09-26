@@ -7,9 +7,10 @@ public class PlayerManager : MonoBehaviour
     private static PlayerManager _instance;
     private int _currentPlayerIndex;
     [SerializeField] private List<ActivePlayer> _players;
-    [SerializeField] private Camera[] _playerCameras;
+    [SerializeField] private List<Camera> _playerCameras;
     private List<ActivePlayer> _activePlayers;
     private int _amountOfPlayers;
+    private int _playersAlive;
 
     private ActivePlayer _currentPlayer;
     private void Awake()
@@ -44,18 +45,19 @@ public class PlayerManager : MonoBehaviour
                 _players[i].gameObject.SetActive(false);
                 Debug.Log("Set player " + (i + 1) + " to false");
             }
-
+            foreach (ActivePlayer player in _activePlayers)
+            {
+                ActivePlayerHealth playerHealth = player.GetComponent<ActivePlayerHealth>();
+                playerHealth.OnEnemyDied += EnemyDied;
+            }
         }
+        _playersAlive = _amountOfPlayers;
     }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
             PlayerEndedTurn();
-        }
-        for (int i = 0; i < _activePlayers.Count; i++)
-        {
-            //_activePlayers[i].GetComponent<>
         }
     }
     public static PlayerManager GetInstance()
@@ -68,23 +70,7 @@ public class PlayerManager : MonoBehaviour
     }
     public void PlayerEndedTurn()
     {
-        //Debug.Log("End current turn for player " + (_currentPlayerIndex+1));
-        //_players[_currentPlayerIndex].UpdateIsActivePlayer(false);
-        //if (_currentPlayerIndex < _amountOfPlayers - 1)
-        //{
-        //    _currentPlayerIndex++;
-        //    //Debug.Log("Increase player index to " + _currentPlayerIndex);
-        //}
-        //else
-        //{
-        //    _currentPlayerIndex = 0;
-        //}
-        //_players[_currentPlayerIndex].UpdateIsActivePlayer(true);
-        //_players[_currentPlayerIndex].CanDoActions();
-        //_players[_currentPlayerIndex].ChangeInput(true);
-
-
-        if(_currentPlayerIndex < _amountOfPlayers - 1)
+        if(_currentPlayerIndex < _activePlayers.Count - 1)
         {
             _currentPlayerIndex++;
         }
@@ -104,10 +90,8 @@ public class PlayerManager : MonoBehaviour
                 _playerCameras[i].depth = 1;
             }
         }
-    }
-    public void PlayerKilled()
-    {
-
+        _currentPlayer.GetComponent<PlayerHeldWeapons>().NewTurn();
+        GetComponent<ActivePlayerInput>().SetCanMove(true);
     }
     public IEnumerator EndCurrentTurn()
     {
@@ -118,5 +102,25 @@ public class PlayerManager : MonoBehaviour
     public List<ActivePlayer> GetAllPlayers()
     {
         return _activePlayers;
+    }
+    private void EnemyDied()
+    {
+        _playersAlive--;
+        Debug.Log("One player died");
+        if(_playersAlive == 1)
+        {
+            //Debug.Log("PLAYER WINS");
+        }
+    }
+    public void RemovePlayer(ActivePlayerHealth _player)
+    {
+        _playersAlive--;
+        ActivePlayer player = _player.GetComponent<ActivePlayer>();
+        for (int i = 0; i < _activePlayers.Count; i++)
+        {
+            if (player == _activePlayers[i]) 
+            _playerCameras.RemoveAt(i);
+        }
+        _activePlayers.Remove(player);
     }
 }

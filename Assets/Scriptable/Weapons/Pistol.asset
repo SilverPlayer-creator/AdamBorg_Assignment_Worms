@@ -15,7 +15,7 @@ MonoBehaviour:
   Damage: 5
   MaxAmmo: 15
   WeaponName: Pistol
-  ShootRate: 4
+  ShootRate: 2
   IsAutomatic: 1
   Force: 500
   Prefab: {fileID: 4555297471384265987, guid: f942ea69ef3556c4d800aa6644bffb5b, type: 3}

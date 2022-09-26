@@ -27,7 +27,7 @@ public class ActivePlayerInput : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        _canMove = true;
     }
 
     // Update is called once per frame
@@ -36,16 +36,19 @@ public class ActivePlayerInput : MonoBehaviour
 
         ActivePlayer currentPlayer = _manager.GetCurrentPlayer();
         _controller = currentPlayer.GetComponent<CharacterController>();
-        Vector3 move = ((currentPlayer.transform.forward * _moveValue.y) + (currentPlayer.transform.right * _moveValue.x)).normalized;
-        currentPlayer.transform.Rotate(new Vector3(0, _rotateValue * _rotateSpeed, 0));
+        if (_canMove)
+        {
+            Vector3 move = ((currentPlayer.transform.forward * _moveValue.y) + (currentPlayer.transform.right * _moveValue.x)).normalized;
+            currentPlayer.transform.Rotate(new Vector3(0, _rotateValue * _rotateSpeed, 0));
+            if (currentPlayer.IsGrounded() && _pressedJump)
+            {
+                _playerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
+            }
+            _controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
+        }
         if (currentPlayer.IsGrounded() && _playerVelocity.y < 0)
         {
             _playerVelocity.y = -2f;
-        }
-
-        if (currentPlayer.IsGrounded() && _pressedJump)
-        {
-            _playerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
         }
 
         _playerVelocity.y += _gravity * Time.fixedDeltaTime;
@@ -60,7 +63,6 @@ public class ActivePlayerInput : MonoBehaviour
             allPlayers[i].GetComponent<CharacterController>().Move(_playerVelocity * Time.fixedDeltaTime);
         }
         _controller.Move(_playerVelocity * Time.fixedDeltaTime);
-        _controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
     }
     public void MovePlayer(InputAction.CallbackContext context)
     {
@@ -72,7 +74,6 @@ public class ActivePlayerInput : MonoBehaviour
     }
     public void Jump(InputAction.CallbackContext context)
     {
-        //Debug.Log("Jump function reached");
         if (context.phase == InputActionPhase.Performed)
         {
             _pressedJump = true;
@@ -85,5 +86,9 @@ public class ActivePlayerInput : MonoBehaviour
     public void Velocity(float gravity)
     {
         _playerVelocity.y += gravity * Time.fixedDeltaTime;
+    }
+    public void SetCanMove(bool canMove)
+    {
+        _canMove = canMove;
     }
 }

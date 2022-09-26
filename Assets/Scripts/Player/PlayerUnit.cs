@@ -145,7 +145,7 @@ public class PlayerUnit : MonoBehaviour
     public void ThrowGrenade(PlayerUnit player)
     {
         Grenades newGrenade = Instantiate(_grenadePrefab, _spawnPoint.position, Quaternion.identity);
-        newGrenade.Initialize(player, _spawnPoint, _playerCamera);
+        //newGrenade.Initialize(player, _spawnPoint, _playerCamera);
     }
     public void AltFire(InputAction.CallbackContext context)
     {

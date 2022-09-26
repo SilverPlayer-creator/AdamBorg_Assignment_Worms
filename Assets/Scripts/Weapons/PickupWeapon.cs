@@ -15,6 +15,7 @@ public class PickupWeapon : MonoBehaviour
     private bool _isAutomatic;
     private bool _holdingFire;
     private int _force;
+    private bool _canFire = true;
     [SerializeField] private Transform _barrel;
     [SerializeField]private GameObject _prefab;
     private Sprite _image;
@@ -33,25 +34,16 @@ public class PickupWeapon : MonoBehaviour
     }
     private void Update()
     {
-        //Debug.Log(_holdingFire);
-        if(_isAutomatic && _holdingFire) //something wrong with holding fire bool, criteria not met
+        if(_isAutomatic && _holdingFire && _canFire) 
         {
-            Debug.Log("Holding fire");
-            if (Time.time >= _nextShootTime)
-            {
-                //Shoot();
-            }
+           if (Time.time >= _nextShootTime)
+            Shoot();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         PlayerHeldWeapons player = other.GetComponent<PlayerHeldWeapons>();
-        if (player != null) 
-        {
-            //player.NewWeapon(this);
-            //gameObject.SetActive(false);
-        }
     }
     public string GetWeaponName()
     {
@@ -63,14 +55,37 @@ public class PickupWeapon : MonoBehaviour
     }
     public void Shoot()
     {
-        Debug.Log("Barrel position: " + _barrel.position);
-        GameObject bullet = Instantiate(_prefab, _barrel.position, transform.rotation);
-        bullet.AddComponent<WeaponProjectile>();
-        bullet.GetComponent<WeaponProjectile>().Initialize(_damage);
-        Debug.Log("Bullet instantiates at: " + bullet.transform.position);
-        Rigidbody body = bullet.GetComponent<Rigidbody>();
-        body.AddForce(transform.forward * _force);
-
+        if(_currentAmmo > 0)
+        {
+            _currentAmmo--;
+            //Debug.Log("Barrel position: " + _barrel.position);
+            GameObject bullet = Instantiate(_prefab, _barrel.position, transform.rotation);
+            bullet.AddComponent<WeaponProjectile>();
+            bullet.GetComponent<WeaponProjectile>().Initialize(_damage);
+            //Debug.Log("Bullet instantiates at: " + bullet.transform.position);
+            Rigidbody body = bullet.GetComponent<Rigidbody>();
+            body.AddForce(transform.forward * _force);
+            _nextShootTime = Time.time + 1f / _fireRate;
+        }
+        else
+        {
+            Reload();
+        }
+    }
+    public void Reload()
+    {
+        if(_currentAmmo < _maxAmmo)
+        {
+            _currentAmmo = _maxAmmo;
+            _holdingFire = false;
+            PlayerManager manager = PlayerManager.GetInstance();
+            _canFire = false;
+            manager.StartCoroutine(manager.EndCurrentTurn());
+        }
+    }
+    public void PlayerTurn()
+    {
+        _canFire = true;
     }
     public void IsHoldingFire(bool isHoldingFire)
     {
@@ -80,5 +95,12 @@ public class PickupWeapon : MonoBehaviour
     public bool WeaponIsAutomatic()
     {
         return _data.IsAutomatic;
+    }
+    public int[] GetAmmo()
+    {
+        int[] ammo = new int[2];
+        ammo[0] = _currentAmmo;
+        ammo[1] = _maxAmmo;
+        return ammo;
     }
 }
