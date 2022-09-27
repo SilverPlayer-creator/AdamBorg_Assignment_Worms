@@ -10,16 +10,31 @@ public class ActivePlayerWeapon : MonoBehaviour
     private bool _isHoldingFire;
     private float _mouseScrollValue;
     private bool _canInput = true;
+    private bool _playersSwitched;
     public void Fire(InputAction.CallbackContext context)
     {
         PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().GetComponent<PlayerHeldWeapons>();
         if (context.performed && _canInput)
         {
-            _isHoldingFire = true;
+            if (!_playersSwitched)
+                _isHoldingFire = true;
         }
-        if(context.canceled)
+        else
         {
             _isHoldingFire = false;
+        }
+        if(context.canceled && _canInput)
+        {
+            if (!_playersSwitched)
+            {
+                _isHoldingFire = false;
+                activePlayerWeapon.SingleFire();
+                Debug.Log("BUtton let go");
+            }
+            else
+            {
+                _playersSwitched = false;
+            }
         }
         activePlayerWeapon.HoldingFire(_isHoldingFire);
     }
@@ -29,7 +44,7 @@ public class ActivePlayerWeapon : MonoBehaviour
         {
             _mouseScrollValue = context.ReadValue<float>();
             PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().GetComponent<PlayerHeldWeapons>();
-            activePlayerWeapon.SwichWeapon(_mouseScrollValue);
+            activePlayerWeapon.SwitchWeapon(_mouseScrollValue);
         }
     }
     public void Reload(InputAction.CallbackContext context)
@@ -50,8 +65,17 @@ public class ActivePlayerWeapon : MonoBehaviour
             _canInput = false;
         }
     }
-    private void SetCanMakeInput(bool canInput)
+    public void SetCanMakeInput(bool canInput)
     {
         _canInput = canInput;
+        if (!canInput)
+        {
+            PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().GetComponent<PlayerHeldWeapons>();
+            activePlayerWeapon.HoldingFire(false);
+        }
+    }
+    public void PlayersSwitched()
+    {
+        _playersSwitched = true;
     }
 }

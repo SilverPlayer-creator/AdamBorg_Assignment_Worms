@@ -18,6 +18,7 @@ public class PlayerHeldWeapons : MonoBehaviour
     [SerializeField] private GameObject _grenadePrefab;
     [SerializeField] private float _throwForce;
     [SerializeField] private Transform _exit;
+    [SerializeField] private WeaponTrajectory _trajectory;
 
     private void Awake()
     {
@@ -38,12 +39,9 @@ public class PlayerHeldWeapons : MonoBehaviour
             {
                 _selectedWeapon.IsHoldingFire(false);
             }
-            else if(!_selectedWeapon.WeaponIsAutomatic() && _holdingFire)
-            {
-                _selectedWeapon.Shoot();
-                _canFire = false;
-            }
         }
+        Vector3 force = _selectedWeapon.GetForce() * transform.forward;
+        _trajectory.DrawTrajectory(force, _exit.position, _selectedWeapon.GetPrefab());
     }
     public void HoldingFire(bool holdingFire)
     {
@@ -51,7 +49,7 @@ public class PlayerHeldWeapons : MonoBehaviour
     }
     public void Shoot()
     {
-        _selectedWeapon.Shoot();
+        //_selectedWeapon.Shoot();
         //DisplayAmmo();
     }
     public void Reload()
@@ -59,7 +57,7 @@ public class PlayerHeldWeapons : MonoBehaviour
         _selectedWeapon.Reload();
         //DisplayAmmo();
     }
-    public void SwichWeapon(float input)
+    public void SwitchWeapon(float input)
     {
         bool switchingWeapons = true;
         Debug.Log("Held weapons: " + _heldWeapons.Count);
@@ -121,5 +119,17 @@ public class PlayerHeldWeapons : MonoBehaviour
         Rigidbody body = grenade.GetComponent<Rigidbody>();
         body.AddForce(transform.forward * _throwForce);
         PlayerManager.GetInstance().GetComponent<ActivePlayerInput>().SetCanMove(false);
+    }
+    public void SingleFire()
+    {
+        if (!_selectedWeapon.WeaponIsAutomatic())
+        {
+            _selectedWeapon.Shoot();
+            Debug.Log("Single fire");
+        }
+    }
+    public void IncreaseDamage(int increaseAmount)
+    {
+        _selectedWeapon.IncreaseDamage(increaseAmount);
     }
 }

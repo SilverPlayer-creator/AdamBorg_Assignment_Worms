@@ -37,7 +37,9 @@ public class PickupWeapon : MonoBehaviour
         if(_isAutomatic && _holdingFire && _canFire) 
         {
            if (Time.time >= _nextShootTime)
-            Shoot();
+            {
+                Shoot();
+            }
         }
     }
 
@@ -57,15 +59,14 @@ public class PickupWeapon : MonoBehaviour
     {
         if(_currentAmmo > 0)
         {
-            _currentAmmo--;
-            //Debug.Log("Barrel position: " + _barrel.position);
-            GameObject bullet = Instantiate(_prefab, _barrel.position, transform.rotation);
+            GameObject bullet = Instantiate(_prefab, _barrel.position, Quaternion.identity);
             bullet.AddComponent<WeaponProjectile>();
             bullet.GetComponent<WeaponProjectile>().Initialize(_damage);
-            //Debug.Log("Bullet instantiates at: " + bullet.transform.position);
             Rigidbody body = bullet.GetComponent<Rigidbody>();
             body.AddForce(transform.forward * _force);
             _nextShootTime = Time.time + 1f / _fireRate;
+            _currentAmmo--;
+            PlayerManager.GetInstance().DecreaseTimeRemaining();
         }
         else
         {
@@ -76,6 +77,7 @@ public class PickupWeapon : MonoBehaviour
     {
         if(_currentAmmo < _maxAmmo)
         {
+            Debug.Log("Reloading " + transform.name);
             _currentAmmo = _maxAmmo;
             _holdingFire = false;
             PlayerManager manager = PlayerManager.GetInstance();
@@ -102,5 +104,17 @@ public class PickupWeapon : MonoBehaviour
         ammo[0] = _currentAmmo;
         ammo[1] = _maxAmmo;
         return ammo;
+    }
+    public void IncreaseDamage(int increasedDamage)
+    {
+        _damage += increasedDamage;
+    }
+    public GameObject GetPrefab()
+    {
+        return _prefab;
+    }
+    public int GetForce()
+    {
+        return _force;
     }
 }

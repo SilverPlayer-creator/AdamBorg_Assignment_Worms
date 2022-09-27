@@ -15,7 +15,6 @@ public class ActivePlayerInput : MonoBehaviour
     private bool _canMove;
     private bool _pressedJump;
     [SerializeField] private float _jumpForce;
-
     private Vector3 _playerVelocity;
     private Vector3 _otherVelocity;
     public Vector3 PlayerVelocity
@@ -24,16 +23,13 @@ public class ActivePlayerInput : MonoBehaviour
         set { _playerVelocity = value; }
     }
     [SerializeField] private float _gravity;
-    // Start is called before the first frame update
     void Start()
     {
         _canMove = true;
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-
         ActivePlayer currentPlayer = _manager.GetCurrentPlayer();
         _controller = currentPlayer.GetComponent<CharacterController>();
         if (_canMove)

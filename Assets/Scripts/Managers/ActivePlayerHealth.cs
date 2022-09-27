@@ -32,5 +32,15 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     {
         //OnEnemyDied?.Invoke();
         PlayerManager.GetInstance().RemovePlayer(this);
+        PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
+    }
+    public void AddHealth(int healthGained)
+    {
+        _currentHealth += healthGained;
+        if(_currentHealth >= _maxHealth)
+        {
+            _currentHealth = _maxHealth;
+        }
+        _healthBar.fillAmount = (float)_currentHealth / (float)_maxHealth;
     }
 }

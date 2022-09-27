@@ -17,6 +17,6 @@ MonoBehaviour:
   WeaponName: Pistol
   ShootRate: 2
   IsAutomatic: 1
-  Force: 500
+  Force: 1500
   Prefab: {fileID: 4555297471384265987, guid: f942ea69ef3556c4d800aa6644bffb5b, type: 3}
   Icon: {fileID: 21300000, guid: 7e717f5a9bf927e4db33c693d88809e5, type: 3}

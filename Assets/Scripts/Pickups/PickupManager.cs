@@ -5,7 +5,10 @@ using UnityEngine;
 public class PickupManager : MonoBehaviour
 {
     private static PickupManager _instance;
-    [SerializeField] private GameObject _pickupPrefab;
+    [SerializeField] private List<GameObject> _pickupPrefabs;
+    [SerializeField] private List<Transform> _pickupLocations;
+    private int _defaultChance;
+    private int _chanceToSpawn;
 
     private void Awake()
     {
@@ -17,18 +20,32 @@ public class PickupManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        _defaultChance = 100;
+        _chanceToSpawn = _defaultChance;
     }
-
     public static PickupManager GetInstance()
     {
         return _instance;
     }
-    private void Update()
+    void Spawn()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        Transform spawnLocation = _pickupLocations[Random.Range(0, _pickupLocations.Count)];
+        GameObject spawnedPrefab = _pickupPrefabs[Random.Range(0, _pickupPrefabs.Count)];
+        GameObject newPrefab = Instantiate(spawnedPrefab, spawnLocation.position, Quaternion.identity);
+    }
+    public void TryToSpawn()
+    {
+        int randomValue = Random.Range(1, _chanceToSpawn);
+        if(randomValue <= 20)
         {
-            GameObject newPickup = Instantiate(_pickupPrefab);
-            newPickup.transform.position = new Vector3(Random.Range(0f, 5f), 2f, Random.Range(0f, 5f));
+            Spawn();
+            _chanceToSpawn = _defaultChance;
+            Debug.Log("Spawn");
+        }
+        else
+        {
+            Debug.Log("Random value was: " + randomValue + ", no spawn");
+            _chanceToSpawn -= 20;
         }
     }
 }
