@@ -7,22 +7,16 @@ public class ActivePlayerInput : MonoBehaviour
 {
     [SerializeField] private PlayerManager _manager;
     [Header("Movement Input")]
-    private Vector2 _moveValue;
     [SerializeField] private float _moveSpeed;
-    private float _rotateValue;
     [SerializeField] private float _rotateSpeed;
-    private CharacterController _controller;
+    [SerializeField] private float _jumpForce;
+    [SerializeField] private float _gravity;
+    private Vector2 _moveValue;
+    private float _rotateValue;
     private bool _canMove;
     private bool _pressedJump;
-    [SerializeField] private float _jumpForce;
-    private Vector3 _playerVelocity;
-    private Vector3 _otherVelocity;
-    public Vector3 PlayerVelocity
-    {
-        get { return _playerVelocity; }
-        set { _playerVelocity = value; }
-    }
-    [SerializeField] private float _gravity;
+    private Vector3 _currentPlayerVelocity;
+    private Vector3 _otherPlayerVelocity;
     void Start()
     {
         _canMove = true;
@@ -31,34 +25,34 @@ public class ActivePlayerInput : MonoBehaviour
     void FixedUpdate()
     {
         ActivePlayer currentPlayer = _manager.GetCurrentPlayer();
-        _controller = currentPlayer.GetComponent<CharacterController>();
+        CharacterController controller = currentPlayer.Controller;
         if (_canMove)
         {
             Vector3 move = ((currentPlayer.transform.forward * _moveValue.y) + (currentPlayer.transform.right * _moveValue.x)).normalized;
             currentPlayer.transform.Rotate(new Vector3(0, _rotateValue * _rotateSpeed, 0));
             if (currentPlayer.IsGrounded() && _pressedJump)
             {
-                _playerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
+                _currentPlayerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
             }
-            _controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
+            controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
         }
-        if (currentPlayer.IsGrounded() && _playerVelocity.y < 0)
+        if (currentPlayer.IsGrounded() && _currentPlayerVelocity.y < 0)
         {
-            _playerVelocity.y = -2f;
+            _currentPlayerVelocity.y = -2f;
         }
 
-        _playerVelocity.y += _gravity * Time.fixedDeltaTime;
-        _otherVelocity.y += _gravity * Time.fixedDeltaTime;
+        _currentPlayerVelocity.y += _gravity * Time.fixedDeltaTime;
+        _otherPlayerVelocity.y += _gravity * Time.fixedDeltaTime;
         List<ActivePlayer> allPlayers = _manager.GetAllPlayers();
         for (int i = 0; i < allPlayers.Count; i++)
         {
             if (allPlayers[i] != currentPlayer)
             {
-                allPlayers[i].GetComponent<CharacterController>().Move(_otherVelocity * Time.fixedDeltaTime);
+                allPlayers[i].Controller.Move(_otherPlayerVelocity * Time.fixedDeltaTime);
             }
-            allPlayers[i].GetComponent<CharacterController>().Move(_playerVelocity * Time.fixedDeltaTime);
+            allPlayers[i].Controller.Move(_currentPlayerVelocity * Time.fixedDeltaTime);
         }
-        _controller.Move(_playerVelocity * Time.fixedDeltaTime);
+        controller.Move(_currentPlayerVelocity * Time.fixedDeltaTime);
     }
     public void MovePlayer(InputAction.CallbackContext context)
     {
@@ -81,7 +75,7 @@ public class ActivePlayerInput : MonoBehaviour
     }
     public void Velocity(float gravity)
     {
-        _playerVelocity.y += gravity * Time.fixedDeltaTime;
+        _currentPlayerVelocity.y += gravity * Time.fixedDeltaTime;
     }
     public void SetCanMove(bool canMove)
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PickupWeapon : MonoBehaviour
+public class PlayerWeapon : MonoBehaviour
 {
     [SerializeField] private WeaponData _data;
     private int _damage;
@@ -15,10 +15,15 @@ public class PickupWeapon : MonoBehaviour
     private bool _isAutomatic;
     private bool _holdingFire;
     private int _force;
+    private int _timeDecrease;
     private bool _canFire = true;
     [SerializeField] private Transform _barrel;
     [SerializeField]private GameObject _prefab;
     private Sprite _image;
+    public Sprite Image
+    {
+        get { return _image; }
+    }
     private void Awake()
     {
         _damage = _data.Damage;
@@ -31,6 +36,8 @@ public class PickupWeapon : MonoBehaviour
         name = _data.WeaponName;
         _image = _data.Icon;
         _isAutomatic = _data.IsAutomatic;
+        _timeDecrease = _data.TimeDecrease;
+        _image = _data.Icon;
     }
     private void Update()
     {
@@ -43,10 +50,6 @@ public class PickupWeapon : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        PlayerHeldWeapons player = other.GetComponent<PlayerHeldWeapons>();
-    }
     public string GetWeaponName()
     {
         return _weaponName;
@@ -66,7 +69,7 @@ public class PickupWeapon : MonoBehaviour
             body.AddForce(transform.forward * _force);
             _nextShootTime = Time.time + 1f / _fireRate;
             _currentAmmo--;
-            PlayerManager.GetInstance().DecreaseTimeRemaining();
+            PlayerManager.GetInstance().DecreaseTimeRemaining(_timeDecrease);
         }
         else
         {

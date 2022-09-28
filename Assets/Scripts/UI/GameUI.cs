@@ -6,18 +6,21 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private Image _progressBar;
-    [SerializeField] private Button _button;
-    [SerializeField] private TextMeshProUGUI _playerName;
+    [SerializeField] private PickupManager _pickupManager;
+    [SerializeField] private TextMeshProUGUI _text;
 
-    private void Start()
+    private void OnEnable()
     {
-        _button.onClick.AddListener(OnButtonPressed);
+        _pickupManager.OnSpawned += ChangeText;
+    }
+    private void OnDisable()
+    {
+        _pickupManager.OnSpawned -= ChangeText;
     }
 
-    public void OnButtonPressed()
+    public void ChangeText()
     {
-        float randomValue = Random.Range(0f, 1f);
-        _progressBar.fillAmount = randomValue;
+       
     }
+
 }

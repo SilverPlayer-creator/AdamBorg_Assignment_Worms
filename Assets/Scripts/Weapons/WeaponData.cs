@@ -12,6 +12,7 @@ public class WeaponData : ScriptableObject
     public float ShootRate;
     public bool IsAutomatic;
     public int Force;
+    public int TimeDecrease;
     public GameObject Prefab;
     public Sprite Icon;
 }

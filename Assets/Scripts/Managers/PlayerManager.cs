@@ -17,15 +17,21 @@ public class PlayerManager : MonoBehaviour
     private bool _gameResultReached;
     [SerializeField] private float _maxTimeLimit;
     private float _currentTimeLimit;
+    private bool _timeCanPass;
     [SerializeField] private Image _timeLimitImage;
     private bool _turnIsEnding;
-    private bool _timeCanPass;
     private float _checkIfFalling;
-
+    private bool _playerHasDoneAction;
+    private ActivePlayerInput _playerInput;
+    private ActivePlayerWeapon _weaponInput;
+    private SceneManagement _sceneManager;
     [SerializeField] private UnityEngine.InputSystem.PlayerInput _input;
 
     private void Awake()
     {
+        _playerInput = GetComponent<ActivePlayerInput>();
+        _weaponInput = GetComponent<ActivePlayerWeapon>();
+        _sceneManager = GetComponent<SceneManagement>();
         if (_instance == null)
         {
             _instance = this;
@@ -44,18 +50,15 @@ public class PlayerManager : MonoBehaviour
             if(i <= _amountOfPlayers - 1)
             {
                 _activePlayers.Add(_players[i]);
-                Debug.Log("Add player " + (i+1) + " to active players.");
             }
 
             if(i > _amountOfPlayers - 1)
             {
                 _players[i].gameObject.SetActive(false);
-                Debug.Log("Set player " + (i + 1) + " to false");
             }
             foreach (ActivePlayer player in _activePlayers)
             {
-                ActivePlayerHealth playerHealth = player.GetComponent<ActivePlayerHealth>();
-                playerHealth.OnEnemyDied += EnemyDied;
+                ActivePlayerHealth playerHealth = player.PlayerHealth;
             }
         }
         _playersAlive = _amountOfPlayers;
@@ -64,7 +67,7 @@ public class PlayerManager : MonoBehaviour
     }
     private void Update()
     {
-        if (!GetCurrentPlayer().IsGrounded())
+        if (!GetCurrentPlayer().IsGrounded() && !_playerHasDoneAction)
         {
             _checkIfFalling += Time.deltaTime;
             if(_checkIfFalling >= 5)
@@ -76,6 +79,10 @@ public class PlayerManager : MonoBehaviour
         {
             _checkIfFalling = 0;
             _timeCanPass = true;
+        }
+        if (_playerHasDoneAction)
+        {
+            _timeCanPass = false;
         }
         if (_timeCanPass)
         {
@@ -114,20 +121,30 @@ public class PlayerManager : MonoBehaviour
             else
                 _playerCameras[i].depth = 1;
         }
-        _currentPlayer.GetComponent<PlayerHeldWeapons>().NewTurn();
-        GetComponent<ActivePlayerInput>().SetCanMove(true);
-        GetComponent<ActivePlayerWeapon>().SetCanMakeInput(true);
+        _currentPlayer.WeaponHolder.NewTurn();
+        _playerInput.SetCanMove(true);
+        _weaponInput.SetCanMakeInput(true);
         _turnIsEnding = false;
         _currentTimeLimit = _maxTimeLimit;
         GetComponent<PickupManager>().TryToSpawn();
-        GetComponent<ActivePlayerWeapon>().PlayersSwitched();
+        _weaponInput.PlayersSwitched();
+        _playerHasDoneAction = false;
+        _timeCanPass = true;
     }
     public IEnumerator EndCurrentTurn()
     {
         _turnIsEnding = true;
-        GetComponent<ActivePlayerInput>().SetCanMove(false);
-        GetComponent<ActivePlayerWeapon>().SetCanMakeInput(false);
+        _playerInput.SetCanMove(false);
+        _weaponInput.SetCanMakeInput(false);
         Debug.Log("End turn");
+        while (true)
+        {
+            if (_currentPlayer.IsGrounded())
+            {
+                break;
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
         yield return new WaitForSeconds(1f);
         PlayerEndedTurn();
     }
@@ -140,19 +157,9 @@ public class PlayerManager : MonoBehaviour
     {
         return _activePlayers;
     }
-    private void EnemyDied()
+    public void RemovePlayer(ActivePlayerHealth playerHealth)
     {
-        //_playersAlive--;
-        //Debug.Log("One player died");
-        //if(_playersAlive == 1)
-        //{
-        //    Debug.Log("Reload");
-        //    GetComponent<SceneManagement>().ReloadScene();
-        //}
-    }
-    public void RemovePlayer(ActivePlayerHealth _player)
-    {
-        ActivePlayer player = _player.GetComponent<ActivePlayer>();
+        ActivePlayer player = playerHealth.ActivePlayer;
         for (int i = 0; i < _activePlayers.Count; i++)
         {
             if (player == _activePlayers[i]) 
@@ -167,25 +174,33 @@ public class PlayerManager : MonoBehaviour
     }
     private IEnumerator GameEnded()
     {
-        GetComponent<ActivePlayerInput>().SetCanMove(false);
-        GetComponent<ActivePlayerWeapon>().SetCanMakeInput(false);
+        _playerInput.SetCanMove(false);
+        _weaponInput.SetCanMakeInput(false);
         _gameResultReached = true;
         yield return new WaitForSeconds(5f);
-        GetComponent<SceneManagement>().ReloadScene();
+        _sceneManager.ReloadScene();
     }
     public Camera GetActiveCamera()
     {
         for (int i = 0; i < _playerCameras.Count; i++)
         {
-            if(_playerCameras[i].depth == 10)
+            if(_playerCameras[i].depth == 1)
             {
                 return _playerCameras[i];
             }
         }
         return null;
     }
-    public void DecreaseTimeRemaining()
+    public void DecreaseTimeRemaining(int timeDecreased)
     {
-        _currentTimeLimit--;
+        _currentTimeLimit-= timeDecreased;
+    }
+    public void TimeCanPass(bool canPass)
+    {
+        _timeCanPass = canPass;
+    }
+    public void PlayerHasDoneAction()
+    {
+        _playerHasDoneAction = true;
     }
 }

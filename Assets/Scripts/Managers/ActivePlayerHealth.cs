@@ -12,9 +12,14 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     private int _currentHealth;
     [SerializeField] private Image _healthBar;
     [SerializeField] private PlayerManager _manager;
-    public event Action OnEnemyDied;
+    private ActivePlayer _activePlayer;
+    public ActivePlayer ActivePlayer
+    {
+        get { return _activePlayer; }
+    }
     void Start()
     {
+        _activePlayer = GetComponent<ActivePlayer>();
         _currentHealth = _maxHealth;
         _healthBar.fillAmount = 1;
         _currentHealth = _maxHealth;

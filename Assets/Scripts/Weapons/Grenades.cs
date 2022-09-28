@@ -10,12 +10,11 @@ public class Grenades : MonoBehaviour
     [SerializeField] private float _timer;
     [SerializeField] private float _explosionRadius;
     [SerializeField] private LayerMask _playerLayer;
+    private bool _exploded;
     private void Awake()
     {
         _body = GetComponent<Rigidbody>();
     }
-
-    // Update is called once per frame
     void Update()
     {
         _timer -= Time.deltaTime;
@@ -32,12 +31,21 @@ public class Grenades : MonoBehaviour
                     hitPlayers.Add(player);
                 }
             }
-            PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
-            Destroy(gameObject);
+            if (!_exploded)
+            {
+                StartCoroutine(Explode());
+                _exploded = true;
+            }
         }
     }
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, _explosionRadius);
+    }
+    private IEnumerator Explode()
+    {
+        GetComponent<MeshRenderer>().enabled = false;
+        yield return new WaitForSeconds(1f);
+        PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
     }
 }

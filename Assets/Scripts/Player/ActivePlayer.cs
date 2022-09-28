@@ -4,15 +4,30 @@ using UnityEngine;
 
 public class ActivePlayer : MonoBehaviour
 {
-    [SerializeField] private PlayerManager _manager;
     [Header("Grounded Check")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private float checkRadius;
-    [SerializeField] private float checkOffset;
     [SerializeField] private LayerMask _platform;
-    [SerializeField] private float _gravity;
-    private Vector3 _playerVelocity;
-
+    private ActivePlayerHealth _playerHealth;
+    public ActivePlayerHealth PlayerHealth
+    {
+        get { return _playerHealth; }
+    }
+    private CharacterController _controller;
+    public CharacterController Controller
+    {
+        get { return _controller; }
+    }
+    private PlayerHeldWeapons _weaponHolder;
+    public PlayerHeldWeapons WeaponHolder
+    {
+        get { return _weaponHolder; }
+    }
+    private void Awake()
+    {
+        _controller = GetComponent<CharacterController>();
+        _weaponHolder = GetComponent<PlayerHeldWeapons>();
+    }
     public bool IsGrounded()
     {
         return Physics.CheckSphere(_groundCheck.position, checkRadius, _platform);

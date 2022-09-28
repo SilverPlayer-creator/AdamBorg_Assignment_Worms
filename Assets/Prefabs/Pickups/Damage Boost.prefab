@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6368291299542648098}
   - component: {fileID: 6656962523849304079}
   m_Layer: 0
-  m_Name: Damage
+  m_Name: Damage Boost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
