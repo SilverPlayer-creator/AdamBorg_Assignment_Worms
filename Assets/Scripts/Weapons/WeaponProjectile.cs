@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class WeaponProjectile : MonoBehaviour
 {
-    private int _damage;
+    protected int _damage;
     public void Initialize(int damage)
     {
         _damage = damage;
+        Debug.Log("Init " + transform.name);
     }
     private void OnCollisionEnter(Collision collision)
     {

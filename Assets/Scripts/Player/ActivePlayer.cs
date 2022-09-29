@@ -23,10 +23,13 @@ public class ActivePlayer : MonoBehaviour
     {
         get { return _weaponHolder; }
     }
+    [SerializeField] private Animator _anim;
+    public Animator Anim { get { return _anim; } }
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
         _weaponHolder = GetComponent<PlayerHeldWeapons>();
+        _playerHealth = GetComponent<ActivePlayerHealth>();
     }
     public bool IsGrounded()
     {

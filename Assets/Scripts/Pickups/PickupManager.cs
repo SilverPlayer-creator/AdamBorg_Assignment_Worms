@@ -7,14 +7,14 @@ using TMPro;
 public class PickupManager : MonoBehaviour
 {
     private static PickupManager _instance;
-    [SerializeField] private List<GameObject> _pickupPrefabs;
-    [SerializeField] private List<Transform> _pickupLocations;
+    [SerializeField] private List<Transform> _transforms;
+    private Dictionary<Transform, bool> _pickupDict = new Dictionary<Transform, bool>();
     private int _defaultChance;
     private int _chanceToSpawn;
-
-    public delegate void SpawnAction();
-    public event SpawnAction OnSpawned;
     [SerializeField] private TextMeshProUGUI _text;
+    [SerializeField] private List<Pickup> _pickups;
+    public delegate void PickupEvent(Vector3 pos, string name);
+    public event PickupEvent OnPickup;
 
     private void Awake()
     {
@@ -28,6 +28,15 @@ public class PickupManager : MonoBehaviour
         }
         _defaultChance = 100;
         _chanceToSpawn = _defaultChance;
+        OnPickup += AddLocationToList;
+        foreach (Transform transform in _transforms)
+        {
+            _pickupDict.Add(transform, true);
+        }
+        foreach (var item in _pickupDict)
+        {
+            Debug.Log(item.Key + " " + item.Value);
+        }
     }
     public static PickupManager GetInstance()
     {
@@ -35,14 +44,18 @@ public class PickupManager : MonoBehaviour
     }
     private IEnumerator Spawn()
     {
-        Transform spawnLocation = _pickupLocations[Random.Range(0, _pickupLocations.Count)];
-        GameObject spawnedPrefab = _pickupPrefabs[Random.Range(0, _pickupPrefabs.Count)];
-        GameObject newPrefab = Instantiate(spawnedPrefab, spawnLocation.position, Quaternion.identity);
-        _text.gameObject.SetActive(true);
-        _text.text = spawnedPrefab.name + " has spawned at " + spawnLocation.name;
-        yield return new WaitForSeconds(4f);
-        _text.gameObject.SetActive(false);
-
+        if(_transforms.Count != 0)
+        {
+            Transform spawnLocation = _transforms[Random.Range(0, _transforms.Count)];
+            Pickup spawnedPrefab = _pickups[Random.Range(0, _pickups.Count)];
+            Pickup newPrefab = Instantiate(spawnedPrefab, spawnLocation.position, Quaternion.identity);
+            _text.gameObject.SetActive(true);
+            _text.text = spawnedPrefab.name + " has spawned at " + spawnLocation.name;
+            newPrefab.GetName(spawnLocation.name);
+            _pickupDict.Remove(spawnLocation);
+            yield return new WaitForSeconds(4f);
+            _text.gameObject.SetActive(false);
+        }
     }
     public void TryToSpawn()
     {
@@ -57,5 +70,13 @@ public class PickupManager : MonoBehaviour
             Debug.Log("Random value was: " + randomValue + ", no spawn");
             _chanceToSpawn -= 20;
         }
+    }
+    public void AddLocationToList(Vector3 pos, string name)
+    {
+        
+    }
+    public void InvokePickup(Vector3 pos, string name)
+    {
+        OnPickup?.Invoke(pos, name);
     }
 }

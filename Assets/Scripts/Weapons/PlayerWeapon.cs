@@ -21,9 +21,12 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField]private GameObject _prefab;
     private Sprite _image;
     public Sprite Image
+
     {
         get { return _image; }
     }
+    private AudioClip _fireSound;
+    private AudioSource _source;
     private void Awake()
     {
         _damage = _data.Damage;
@@ -38,6 +41,8 @@ public class PlayerWeapon : MonoBehaviour
         _isAutomatic = _data.IsAutomatic;
         _timeDecrease = _data.TimeDecrease;
         _image = _data.Icon;
+        _fireSound = _data.FireSound;
+        _source = GetComponent<AudioSource>();
     }
     private void Update()
     {
@@ -63,13 +68,14 @@ public class PlayerWeapon : MonoBehaviour
         if(_currentAmmo > 0)
         {
             GameObject bullet = Instantiate(_prefab, _barrel.position, Quaternion.identity);
-            bullet.AddComponent<WeaponProjectile>();
             bullet.GetComponent<WeaponProjectile>().Initialize(_damage);
             Rigidbody body = bullet.GetComponent<Rigidbody>();
             body.AddForce(transform.forward * _force);
             _nextShootTime = Time.time + 1f / _fireRate;
             _currentAmmo--;
-            PlayerManager.GetInstance().DecreaseTimeRemaining(_timeDecrease);
+            PlayerManager manager = PlayerManager.GetInstance();
+            manager.DecreaseTimeRemaining(_timeDecrease);
+            AudioManager.AudioInstance().PlaySound(_weaponName);
         }
         else
         {
@@ -86,6 +92,7 @@ public class PlayerWeapon : MonoBehaviour
             PlayerManager manager = PlayerManager.GetInstance();
             _canFire = false;
             manager.StartCoroutine(manager.EndCurrentTurn());
+            //AudioManager.AudioInstance().PlaySound("Reload");
         }
     }
     public void PlayerTurn()

@@ -15,4 +15,5 @@ public class WeaponData : ScriptableObject
     public int TimeDecrease;
     public GameObject Prefab;
     public Sprite Icon;
+    public AudioClip FireSound;
 }

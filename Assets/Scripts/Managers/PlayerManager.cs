@@ -9,7 +9,6 @@ public class PlayerManager : MonoBehaviour
     private static PlayerManager _instance;
     private int _currentPlayerIndex;
     [SerializeField] private List<ActivePlayer> _players;
-    [SerializeField] private List<Camera> _playerCameras;
     private List<ActivePlayer> _activePlayers;
     private int _amountOfPlayers;
     private int _playersAlive;
@@ -25,13 +24,18 @@ public class PlayerManager : MonoBehaviour
     private ActivePlayerInput _playerInput;
     private ActivePlayerWeapon _weaponInput;
     private SceneManagement _sceneManager;
+    private PickupManager _pickupManager;
     [SerializeField] private UnityEngine.InputSystem.PlayerInput _input;
+
+    //TEST
+    [SerializeField] private CameraFollow _mainCamera;
 
     private void Awake()
     {
         _playerInput = GetComponent<ActivePlayerInput>();
         _weaponInput = GetComponent<ActivePlayerWeapon>();
         _sceneManager = GetComponent<SceneManagement>();
+        _pickupManager = GetComponent<PickupManager>();
         if (_instance == null)
         {
             _instance = this;
@@ -70,19 +74,11 @@ public class PlayerManager : MonoBehaviour
         if (!GetCurrentPlayer().IsGrounded() && !_playerHasDoneAction)
         {
             _checkIfFalling += Time.deltaTime;
-            if(_checkIfFalling >= 5)
-            {
-                _timeCanPass = false;
-            }
         }
         else
         {
             _checkIfFalling = 0;
             _timeCanPass = true;
-        }
-        if (_playerHasDoneAction)
-        {
-            _timeCanPass = false;
         }
         if (_timeCanPass)
         {
@@ -93,9 +89,13 @@ public class PlayerManager : MonoBehaviour
             StartCoroutine(EndCurrentTurn());
         }
         _timeLimitImage.fillAmount = (_currentTimeLimit / _maxTimeLimit);
+        if (_checkIfFalling >= 5 || _playerHasDoneAction)
+        {
+            _timeCanPass = false;
+        }
         if (Input.GetKeyDown(KeyCode.T))
         {
-            PlayerEndedTurn();
+            StartCoroutine(EndCurrentTurn());
         }
     }
     public static PlayerManager GetInstance()
@@ -114,20 +114,13 @@ public class PlayerManager : MonoBehaviour
             _currentPlayerIndex = 0;
 
         _currentPlayer = _activePlayers[_currentPlayerIndex];
-        for (int i = 0; i < _activePlayers.Count; i++)
-        {
-            if(i != _currentPlayerIndex)
-                _playerCameras[i].depth = 0;
-            else
-                _playerCameras[i].depth = 1;
-        }
+        _mainCamera.ChangePlayer(_currentPlayer.transform);
         _currentPlayer.WeaponHolder.NewTurn();
         _playerInput.SetCanMove(true);
         _weaponInput.SetCanMakeInput(true);
         _turnIsEnding = false;
         _currentTimeLimit = _maxTimeLimit;
-        GetComponent<PickupManager>().TryToSpawn();
-        _weaponInput.PlayersSwitched();
+        _pickupManager.TryToSpawn();
         _playerHasDoneAction = false;
         _timeCanPass = true;
     }
@@ -160,11 +153,6 @@ public class PlayerManager : MonoBehaviour
     public void RemovePlayer(ActivePlayerHealth playerHealth)
     {
         ActivePlayer player = playerHealth.ActivePlayer;
-        for (int i = 0; i < _activePlayers.Count; i++)
-        {
-            if (player == _activePlayers[i]) 
-            _playerCameras.RemoveAt(i);
-        }
         _activePlayers.Remove(player);
         _playersAlive--;
         if(_playersAlive == 1 && !_gameResultReached)
@@ -176,20 +164,10 @@ public class PlayerManager : MonoBehaviour
     {
         _playerInput.SetCanMove(false);
         _weaponInput.SetCanMakeInput(false);
+        _timeCanPass = false;
         _gameResultReached = true;
         yield return new WaitForSeconds(5f);
         _sceneManager.ReloadScene();
-    }
-    public Camera GetActiveCamera()
-    {
-        for (int i = 0; i < _playerCameras.Count; i++)
-        {
-            if(_playerCameras[i].depth == 1)
-            {
-                return _playerCameras[i];
-            }
-        }
-        return null;
     }
     public void DecreaseTimeRemaining(int timeDecreased)
     {

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] private float _speed;
-    private Rigidbody _body;
-    [SerializeField] private GameObject _prefab;
+    [SerializeField] protected float _speed;
+    protected Rigidbody _body;
+    [SerializeField] protected GameObject _prefab;
 
     private void Awake()
     {

@@ -53,6 +53,14 @@ public class ActivePlayerInput : MonoBehaviour
             allPlayers[i].Controller.Move(_currentPlayerVelocity * Time.fixedDeltaTime);
         }
         controller.Move(_currentPlayerVelocity * Time.fixedDeltaTime);
+        if(_moveValue.x != 0 && currentPlayer.IsGrounded() || _moveValue.y != 0 && currentPlayer.IsGrounded())
+        {
+            currentPlayer.Anim.SetBool("Walk_Anim", true);
+        }
+        else
+        {
+            currentPlayer.Anim.SetBool("Walk_Anim", false);
+        }
     }
     public void MovePlayer(InputAction.CallbackContext context)
     {

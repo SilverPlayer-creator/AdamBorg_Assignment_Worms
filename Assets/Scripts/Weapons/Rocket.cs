@@ -2,25 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rocket : MonoBehaviour
+public class Rocket : WeaponProjectile
 {
-    [SerializeField] private float _speed;
-    private Rigidbody _body;
-    private void Awake()
-    {
-        _body = GetComponent<Rigidbody>();
-    }
-    public void Initialize(Transform _forward)
-    {
-        _body.AddForce((_forward.forward + transform.up) * 200f);
-    }
+    [SerializeField] private float _explosionRadius;
+    [SerializeField] private LayerMask _playerLayer;
     private void OnCollisionEnter(Collision collision)
     {
-        GameObject collisionObject = collision.gameObject;
-        IDamageable damageableObject = collisionObject.GetComponent<IDamageable>();
-        if(damageableObject != null)
+        ActivePlayerHealth player = collision.gameObject.GetComponent<ActivePlayerHealth>();
+        if (player != null)
         {
-            damageableObject.TakeDamage(5);
+            player.TakeDamage(_damage);
+        }
+        Collider[] hitObjects = Physics.OverlapSphere(transform.position, _explosionRadius);
+        List<ActivePlayerHealth> hitPlayers = new List<ActivePlayerHealth>();
+        foreach (Collider collider in hitObjects)
+        {
+            ActivePlayerHealth _player = collider.gameObject.GetComponent<ActivePlayerHealth>();
+            if (player != null && !hitPlayers.Contains(_player))
+            {
+                player.TakeDamage(_damage);
+                hitPlayers.Add(_player);
+                Debug.Log("Player caught in radius");
+            }
         }
         Destroy(gameObject);
     }

@@ -69,16 +69,17 @@ public class PlayerHeldWeapons : MonoBehaviour
     }
     public void SwitchWeapon(float input)
     {
+        int currentSelectedWeaponIndex = _selectedWeaponIndex;
         bool switchingWeapons = true;
         if (switchingWeapons)
         {
             if (input >= 1)
             {
-                if (_selectedWeaponIndex < _activatedWeapons.Count)
+                if (_selectedWeaponIndex < _activatedWeapons.Count -1)
                 {
                     _selectedWeaponIndex++;
                 }
-                if(_selectedWeaponIndex >= _activatedWeapons.Count)
+                else
                 {
                     _selectedWeaponIndex = 0;
                 }
@@ -91,12 +92,15 @@ public class PlayerHeldWeapons : MonoBehaviour
                 }
                 else
                 {
-                    _selectedWeaponIndex = _activatedWeapons.Count;
+                    _selectedWeaponIndex = _activatedWeapons.Count - 1;
                 }
             }
-            Debug.Log("Weapon index: " + _selectedWeaponIndex);
             _selectedWeapon = _activatedWeapons[_selectedWeaponIndex];
             switchingWeapons = false;
+        }
+        if(_selectedWeaponIndex != currentSelectedWeaponIndex)
+        {
+            AudioManager.AudioInstance().PlaySound("WeaponChange");
         }
         _activeWeaponImage.sprite = _selectedWeapon.Image;
         DisplayAmmo();
@@ -106,7 +110,6 @@ public class PlayerHeldWeapons : MonoBehaviour
         for (int i = 0; i < _heldWeapons.Count; i++)
         {
             _heldWeapons[i].PlayerTurn();
-            Debug.Log("Next players turn");
             _canFire = true;
             _holdingFire = false;
         }
@@ -114,7 +117,6 @@ public class PlayerHeldWeapons : MonoBehaviour
     }
     void DisplayAmmo()
     {
-        Debug.Log("Display");
         int[] ammo = _selectedWeapon.GetAmmo();
         int currentAmmo = ammo[0];
         int maxAmmo = ammo[1];
@@ -133,26 +135,19 @@ public class PlayerHeldWeapons : MonoBehaviour
     {
         _selectedWeapon.IncreaseDamage(increaseAmount);
     }
-    private void OnTriggerEnter(Collider other)
+    public void AddWeapon(string newWeaponname)
     {
-        WeaponPickup newWeapon = other.GetComponent<WeaponPickup>();
-        if (newWeapon != null)
+        foreach (PlayerWeapon weapon in _heldWeapons)
         {
-            foreach (PlayerWeapon weapon in _heldWeapons)
+            if(weapon.gameObject.name == newWeaponname && !weapon.gameObject.activeSelf)
             {
-                if(weapon.gameObject.name == newWeapon.WeaponName() && !weapon.gameObject.activeSelf)
-                {
-                    weapon.gameObject.SetActive(true);
-                    _activatedWeapons.Add(weapon);
-                    Destroy(newWeapon.gameObject);
-                }
+                weapon.gameObject.SetActive(true);
+                _activatedWeapons.Add(weapon);
             }
         }
-        GrenadePickup grenadePickup = other.GetComponent<GrenadePickup>();
-        if(grenadePickup != null)
-        {
-            _grenadeAmount += 2;
-            Destroy(grenadePickup.gameObject);
-        }
+    }
+    public void AddGrenades()
+    {
+        _grenadeAmount += 2;
     }
 }

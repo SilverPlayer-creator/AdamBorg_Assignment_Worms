@@ -58,15 +58,13 @@ public class ActivePlayerWeapon : MonoBehaviour
     {
         if (context.performed && _canInput)
         {
-            Debug.Log("Throw pressed");
             PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
             if(activePlayerWeapon.GrenadeAmount > 0)
             {
                 activePlayerWeapon.ThrowGrenade();
                 GetComponent<ActivePlayerInput>().SetCanMove(false);
-                GetComponent<PlayerManager>().TimeCanPass(false);
-                GetComponent<PlayerManager>().PlayerHasDoneAction();
-                Debug.Log("Time can not pass");
+                _manager.TimeCanPass(false);
+                _manager.PlayerHasDoneAction();
                 _canInput = false;
             }
         }
@@ -79,9 +77,5 @@ public class ActivePlayerWeapon : MonoBehaviour
             PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
             activePlayerWeapon.HoldingFire(false);
         }
-    }
-    public void PlayersSwitched()
-    {
-        _playersSwitched = true;
     }
 }

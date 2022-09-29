@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6368291299542648096}
   - component: {fileID: 6368291299542648097}
   - component: {fileID: 6368291299542648098}
-  - component: {fileID: 6656962523849304079}
+  - component: {fileID: 7625747069824320265}
   m_Layer: 0
   m_Name: Damage Boost
   m_TagString: Untagged
@@ -98,7 +98,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6656962523849304079
+--- !u!114 &7625747069824320265
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,7 +107,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6368291299542648099}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36cdafc838ef44143bbf1649e28d18e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 71b73ac9b73340b488b5d5e1d79e422a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _damageGain: 20
+  _type: 2
+  _value: 10
+  _mesh: {fileID: 0}
+  _name: 
