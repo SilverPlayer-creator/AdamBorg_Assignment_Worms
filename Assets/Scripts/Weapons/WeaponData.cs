@@ -9,7 +9,7 @@ public class WeaponData : ScriptableObject
     public int Damage;
     public int MaxAmmo;
     public string WeaponName;
-    public float ShootRate;
+    public float FireRate;
     public bool IsAutomatic;
     public int Force;
     public int TimeDecrease;

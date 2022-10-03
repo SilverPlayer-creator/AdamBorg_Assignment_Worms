@@ -25,6 +25,6 @@ public class Rocket : WeaponProjectile
                 Debug.Log("Player caught in radius");
             }
         }
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 }

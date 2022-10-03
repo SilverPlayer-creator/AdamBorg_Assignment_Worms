@@ -6,26 +6,25 @@ using TMPro;
 
 public class PlayerHeldWeapons : MonoBehaviour
 {
-    [SerializeField] private List<PlayerWeapon> _heldWeapons;
-    private List<PlayerWeapon> _activatedWeapons = new List<PlayerWeapon>();
-    private PlayerWeapon _selectedWeapon;
+    public int GrenadeAmount { get { return _grenadeAmount; } }
     public PlayerWeapon SelectedWeapon { get { return _selectedWeapon; } }
-    private int _selectedWeaponIndex;
-    private bool _holdingFire;
+    [SerializeField] private List<PlayerWeapon> _heldWeapons;
     [SerializeField] private GameObject _projectile;
     [SerializeField] private float _fireRate;
     [SerializeField] private PlayerWeapon _defaultWeapon;
-    bool _canFire;
     [SerializeField] private GameObject _grenadePrefab;
     [SerializeField] private float _throwForce;
     [SerializeField] private Transform _exit;
     [SerializeField] private WeaponTrajectory _trajectory;
     [SerializeField] private PlayerManager _manager;
-    private int _grenadeAmount = 1;
-    public int GrenadeAmount { get { return _grenadeAmount; } }
     [SerializeField] private Image _activeWeaponImage;
     [SerializeField] private TextMeshProUGUI _ammoText;
-
+    private int _grenadeAmount = 1;
+    private bool _canFire;
+    private List<PlayerWeapon> _activatedWeapons = new List<PlayerWeapon>();
+    private PlayerWeapon _selectedWeapon;
+    private int _selectedWeaponIndex;
+    private bool _holdingFire;
     private void Awake()
     {
         _selectedWeapon = _defaultWeapon;
@@ -38,18 +37,18 @@ public class PlayerHeldWeapons : MonoBehaviour
     {
         if (_canFire)
         {
-            if (_selectedWeapon.WeaponIsAutomatic() && _holdingFire)
+            if (_selectedWeapon.WeaponIsAutomatic && _holdingFire)
             {
                 _selectedWeapon.IsHoldingFire(_holdingFire);
             }
-            else if (_selectedWeapon.WeaponIsAutomatic() && !_holdingFire)
+            else if (_selectedWeapon.WeaponIsAutomatic && !_holdingFire)
             {
                 _selectedWeapon.IsHoldingFire(false);
             }
             DisplayAmmo();
         }
-        Vector3 force = _selectedWeapon.GetForce() * transform.forward;
-        _trajectory.DrawTrajectory(force, _exit.position, _selectedWeapon.GetPrefab());
+        Vector3 force = _selectedWeapon.GetForce * transform.forward;
+        _trajectory.DrawTrajectory(force, _exit.position, _selectedWeapon.GetPrefab);
     }
     public void HoldingFire(bool holdingFire)
     {
@@ -57,10 +56,8 @@ public class PlayerHeldWeapons : MonoBehaviour
     }
     public void SingleFire()
     {
-        if (!_selectedWeapon.WeaponIsAutomatic())
-        {
+        if (!_selectedWeapon.WeaponIsAutomatic)
             _selectedWeapon.Shoot();
-        }
     }
     public void Reload()
     {
@@ -113,7 +110,7 @@ public class PlayerHeldWeapons : MonoBehaviour
             _canFire = true;
             _holdingFire = false;
         }
-        _activeWeaponImage.sprite = _manager.GetCurrentPlayer().WeaponHolder.SelectedWeapon.Image;
+        _activeWeaponImage.sprite = _manager.GetCurrentPlayer.WeaponHolder.SelectedWeapon.Image;
     }
     void DisplayAmmo()
     {

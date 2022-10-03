@@ -8,15 +8,18 @@ using TMPro;
 
 public class ActivePlayerHealth : MonoBehaviour, IDamageable
 {
-    [SerializeField] private int _maxHealth;
-    private int _currentHealth;
-    [SerializeField] private Image _healthBar;
-    [SerializeField] private PlayerManager _manager;
-    private ActivePlayer _activePlayer;
     public ActivePlayer ActivePlayer
     {
         get { return _activePlayer; }
     }
+    public delegate void PlayerDeath(ActivePlayer playerKilled);
+    public event PlayerDeath OnPlayerDeath;
+    [SerializeField] private int _maxHealth;
+    [SerializeField] private Image _healthBar;
+    [SerializeField] private PlayerManager _manager;
+    [SerializeField] private GameObject _playerMesh, _playerUI;
+    private ActivePlayer _activePlayer;
+    private int _currentHealth;
     void Start()
     {
         _activePlayer = GetComponent<ActivePlayer>();
@@ -35,9 +38,9 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     }
     void Die()
     {
-        //OnEnemyDied?.Invoke();
-        PlayerManager.GetInstance().RemovePlayer(this);
-        PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
+        OnPlayerDeath?.Invoke(_activePlayer);
+        _playerMesh.gameObject.SetActive(false);
+        _playerUI.SetActive(false);
     }
     public void AddHealth(int healthGained)
     {

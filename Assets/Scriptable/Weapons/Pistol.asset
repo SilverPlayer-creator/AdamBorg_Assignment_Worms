@@ -15,7 +15,7 @@ MonoBehaviour:
   Damage: 5
   MaxAmmo: 15
   WeaponName: Pistol
-  ShootRate: 2
+  FireRate: 2
   IsAutomatic: 1
   Force: 3000
   TimeDecrease: 2

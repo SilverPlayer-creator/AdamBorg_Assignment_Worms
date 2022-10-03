@@ -6,17 +6,6 @@ public class WeaponTrajectory : MonoBehaviour
 {
     [SerializeField] private LineRenderer _lineRenderer;
     [SerializeField] private int _stepCount = 10;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void DrawTrajectory(Vector3 force, Vector3 startPos, GameObject prefab)
     {
         float projectileMass = prefab.GetComponent<Rigidbody>().mass;

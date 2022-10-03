@@ -8,28 +8,22 @@ public class ActivePlayer : MonoBehaviour
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private float checkRadius;
     [SerializeField] private LayerMask _platform;
-    private ActivePlayerHealth _playerHealth;
-    public ActivePlayerHealth PlayerHealth
-    {
-        get { return _playerHealth; }
-    }
-    private CharacterController _controller;
-    public CharacterController Controller
-    {
-        get { return _controller; }
-    }
-    private PlayerHeldWeapons _weaponHolder;
-    public PlayerHeldWeapons WeaponHolder
-    {
-        get { return _weaponHolder; }
-    }
     [SerializeField] private Animator _anim;
+    [SerializeField] private ActivePlayerHealth _playerHealth;
     public Animator Anim { get { return _anim; } }
+    public ActivePlayerHealth PlayerHealth { get { return _playerHealth; } }
+    public CharacterController Controller { get { return _controller; } }
+    public PlayerHeldWeapons WeaponHolder { get { return _weaponHolder; } }
+    private CharacterController _controller;
+    private PlayerHeldWeapons _weaponHolder;
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
         _weaponHolder = GetComponent<PlayerHeldWeapons>();
-        _playerHealth = GetComponent<ActivePlayerHealth>();
+    }
+    private void Update()
+    {
+        _anim.SetBool("Grounded", IsGrounded());
     }
     public bool IsGrounded()
     {

@@ -6,15 +6,10 @@ public class Grenades : MonoBehaviour
 {
     [SerializeField] private float _throwForce;
     [SerializeField] private int _damage;
-    private Rigidbody _body;
     [SerializeField] private float _timer;
     [SerializeField] private float _explosionRadius;
     [SerializeField] private LayerMask _playerLayer;
     private bool _exploded;
-    private void Awake()
-    {
-        _body = GetComponent<Rigidbody>();
-    }
     void Update()
     {
         _timer -= Time.deltaTime;
@@ -46,6 +41,6 @@ public class Grenades : MonoBehaviour
     {
         GetComponent<MeshRenderer>().enabled = false;
         yield return new WaitForSeconds(1f);
-        PlayerManager.GetInstance().StartCoroutine(PlayerManager.GetInstance().EndCurrentTurn());
+        TurnManager.TurnInstance.InvokeTurnEnd(true);
     }
 }

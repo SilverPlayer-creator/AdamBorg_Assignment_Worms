@@ -6,47 +6,25 @@ using UnityEngine.UI;
 public class PlayerWeapon : MonoBehaviour
 {
     [SerializeField] private WeaponData _data;
-    private int _damage;
-    private string _weaponName;
-    private int _maxAmmo;
-    private int _currentAmmo;
-    private float _fireRate;
-    private float _nextShootTime;
-    private bool _isAutomatic;
-    private bool _holdingFire;
-    private int _force;
-    private int _timeDecrease;
-    private bool _canFire = true;
     [SerializeField] private Transform _barrel;
-    [SerializeField]private GameObject _prefab;
-    private Sprite _image;
-    public Sprite Image
-
-    {
-        get { return _image; }
-    }
-    private AudioClip _fireSound;
-    private AudioSource _source;
+    public Sprite Image { get { return _data.Icon; } }
+    public delegate void FireDelegate(int timeDecrease);
+    public event FireDelegate OnFireEvent;
+    public delegate void ReloadDelegate();
+    public event ReloadDelegate OnReload;
+    private int _currentDamage;
+    private int _currentAmmo;
+    private float _nextShootTime;
+    private bool _holdingFire;
+    private bool _canFire = true;
     private void Awake()
     {
-        _damage = _data.Damage;
-        _weaponName = _data.WeaponName;
-        _maxAmmo = _data.MaxAmmo;
-        _currentAmmo = _maxAmmo;
-        _fireRate = _data.ShootRate;
-        _force = _data.Force;
-        _prefab = _data.Prefab;
-        name = _data.WeaponName;
-        _image = _data.Icon;
-        _isAutomatic = _data.IsAutomatic;
-        _timeDecrease = _data.TimeDecrease;
-        _image = _data.Icon;
-        _fireSound = _data.FireSound;
-        _source = GetComponent<AudioSource>();
+        _currentDamage = _data.Damage;
+        _currentAmmo = _data.MaxAmmo;
     }
     private void Update()
     {
-        if(_isAutomatic && _holdingFire && _canFire) 
+        if(_data.IsAutomatic && _holdingFire && _canFire) 
         {
            if (Time.time >= _nextShootTime)
             {
@@ -54,28 +32,21 @@ public class PlayerWeapon : MonoBehaviour
             }
         }
     }
-
-    public string GetWeaponName()
-    {
-        return _weaponName;
-    }
-    public Sprite GetIcon()
-    {
-        return _image;
-    }
     public void Shoot()
     {
         if(_currentAmmo > 0)
         {
-            GameObject bullet = Instantiate(_prefab, _barrel.position, Quaternion.identity);
-            bullet.GetComponent<WeaponProjectile>().Initialize(_damage);
-            Rigidbody body = bullet.GetComponent<Rigidbody>();
-            body.AddForce(transform.forward * _force);
-            _nextShootTime = Time.time + 1f / _fireRate;
+            //GameObject bullet = Instantiate(_data.Prefab, _barrel.position, Quaternion.identity);
+            //bullet.GetComponent<WeaponProjectile>().Initialize(_currentDamage);
+            //Rigidbody body = bullet.GetComponent<Rigidbody>();
+            //body.AddForce(transform.forward * _data.Force);
+            GameObject projectile = ProjectilePooler.PoolInstance.SpawnFromPool(_data.WeaponName, _barrel.position, Quaternion.identity);
+            projectile.GetComponent<Rigidbody>().AddForce(_barrel.transform.forward * _data.Force);
+            projectile.GetComponent<WeaponProjectile>().Initialize(_currentDamage);
+            _nextShootTime = Time.time + 1f / _data.FireRate;
             _currentAmmo--;
-            PlayerManager manager = PlayerManager.GetInstance();
-            manager.DecreaseTimeRemaining(_timeDecrease);
-            AudioManager.AudioInstance().PlaySound(_weaponName);
+            TurnManager.TurnInstance.DecreaseTimeRemaining(_data.TimeDecrease);
+            AudioManager.AudioInstance().PlaySound(_data.WeaponName);
         }
         else
         {
@@ -84,15 +55,13 @@ public class PlayerWeapon : MonoBehaviour
     }
     public void Reload()
     {
-        if(_currentAmmo < _maxAmmo)
+        if(_currentAmmo < _data.MaxAmmo)
         {
-            Debug.Log("Reloading " + transform.name);
-            _currentAmmo = _maxAmmo;
+            _currentAmmo = _data.MaxAmmo;
             _holdingFire = false;
-            PlayerManager manager = PlayerManager.GetInstance();
             _canFire = false;
-            manager.StartCoroutine(manager.EndCurrentTurn());
-            //AudioManager.AudioInstance().PlaySound("Reload");
+            TurnManager.TurnInstance.QuickEnd();
+            AudioManager.AudioInstance().PlaySound("Reload");
         }
     }
     public void PlayerTurn()
@@ -101,30 +70,21 @@ public class PlayerWeapon : MonoBehaviour
     }
     public void IsHoldingFire(bool isHoldingFire)
     {
-        //Debug.Log("Is holding fire: " + _holdingFire);
         _holdingFire = isHoldingFire;
     }
-    public bool WeaponIsAutomatic()
-    {
-        return _data.IsAutomatic;
-    }
+    public bool WeaponIsAutomatic => _data.IsAutomatic;
+
     public int[] GetAmmo()
     {
         int[] ammo = new int[2];
         ammo[0] = _currentAmmo;
-        ammo[1] = _maxAmmo;
+        ammo[1] = _data.MaxAmmo;
         return ammo;
     }
     public void IncreaseDamage(int increasedDamage)
     {
-        _damage += increasedDamage;
+        _currentDamage += increasedDamage;
     }
-    public GameObject GetPrefab()
-    {
-        return _prefab;
-    }
-    public int GetForce()
-    {
-        return _force;
-    }
+    public GameObject GetPrefab => _data.Prefab;
+    public int GetForce => _data.Force;
 }

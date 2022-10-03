@@ -8,12 +8,6 @@ public class Pickup : MonoBehaviour
     private enum _typeOfPickup { health, grenade, damage, rocket }
     [SerializeField] private _typeOfPickup _type;
     [SerializeField] private int _value;
-    [SerializeField] private GameObject _mesh;
-    public GameObject Mesh { get { return _mesh; } }
-    [SerializeField] private string _name;
-    public string PickupName { get { return _name; } }
-    private string _locationName;
-    private int _transformIndex;
     private void OnTriggerEnter(Collider other)
     {
         ActivePlayer player = other.GetComponent<ActivePlayer>();
@@ -41,16 +35,8 @@ public class Pickup : MonoBehaviour
                 default:
                     break;
             }
-            PickupManager.GetInstance().InvokePickup(transform.position, _locationName);
+            PickupManager.GetInstance.InvokePickup(transform.position);
             Destroy(gameObject);
         }
-    }
-    public void GetName(string name)
-    {
-        _locationName = name;
-    }
-    public void SetIndex(int index)
-    {
-        _transformIndex = index;
     }
 }

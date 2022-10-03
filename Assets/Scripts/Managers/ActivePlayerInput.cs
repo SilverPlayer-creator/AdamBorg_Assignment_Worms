@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class ActivePlayerInput : MonoBehaviour
 {
+    public delegate void RoundStartDelegate();
+    public event RoundStartDelegate OnRoundStart;
     [SerializeField] private PlayerManager _manager;
     [Header("Movement Input")]
     [SerializeField] private float _moveSpeed;
@@ -19,12 +21,14 @@ public class ActivePlayerInput : MonoBehaviour
     private Vector3 _otherPlayerVelocity;
     void Start()
     {
-        _canMove = true;
+        StartCoroutine(RoundStart());
+        TurnManager.TurnInstance.OnTurnEnding += ChangeInput;
+        GetComponent<ActivePlayerWeapon>().OnThrow += ChangeInput;
     }
 
     void FixedUpdate()
     {
-        ActivePlayer currentPlayer = _manager.GetCurrentPlayer();
+        ActivePlayer currentPlayer = _manager.GetCurrentPlayer;
         CharacterController controller = currentPlayer.Controller;
         if (_canMove)
         {
@@ -43,7 +47,7 @@ public class ActivePlayerInput : MonoBehaviour
 
         _currentPlayerVelocity.y += _gravity * Time.fixedDeltaTime;
         _otherPlayerVelocity.y += _gravity * Time.fixedDeltaTime;
-        List<ActivePlayer> allPlayers = _manager.GetAllPlayers();
+        List<ActivePlayer> allPlayers = _manager.GetAllPlayers;
         for (int i = 0; i < allPlayers.Count; i++)
         {
             if (allPlayers[i] != currentPlayer)
@@ -64,6 +68,7 @@ public class ActivePlayerInput : MonoBehaviour
     }
     public void MovePlayer(InputAction.CallbackContext context)
     {
+        if(_canMove)
         _moveValue = context.ReadValue<Vector2>();
     }
     public void RotatePlayer(InputAction.CallbackContext context)
@@ -81,12 +86,21 @@ public class ActivePlayerInput : MonoBehaviour
             _pressedJump = false;
         }
     }
-    public void Velocity(float gravity)
+    private void ChangeInput(bool active)
     {
-        _currentPlayerVelocity.y += gravity * Time.fixedDeltaTime;
+        _canMove = active;
+        if (!active)
+            _moveValue = Vector2.zero;
     }
-    public void SetCanMove(bool canMove)
+    private void OnDisable()
     {
-        _canMove = canMove;
+        TurnManager.TurnInstance.OnTurnEnding -= ChangeInput;
+        GetComponent<ActivePlayerWeapon>().OnThrow -= ChangeInput;
+    }
+    IEnumerator RoundStart()
+    {
+        yield return new WaitForSeconds(5f);
+        _canMove = true;
+        OnRoundStart?.Invoke();
     }
 }

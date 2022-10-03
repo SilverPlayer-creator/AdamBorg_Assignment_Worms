@@ -6,23 +6,27 @@ using UnityEngine.InputSystem;
 
 public class ActivePlayerWeapon : MonoBehaviour
 {
-    [SerializeField] private PlayerManager _manager;
+    public delegate void ThrowDelegate(bool thrown);
+    public event ThrowDelegate OnThrow;
+    [SerializeField] private PlayerManager _playerManager;
     private bool _isHoldingFire;
     private float _mouseScrollValue;
     private bool _canInput = true;
     private bool _playersSwitched;
+    private void Awake()
+    {
+        TurnManager.TurnInstance.OnTurnEnding += ChangeInput;
+    }
     public void Fire(InputAction.CallbackContext context)
     {
-        PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
+        PlayerHeldWeapons activePlayerWeapon = _playerManager.GetCurrentPlayer.WeaponHolder;
         if (context.performed && _canInput)
         {
             if (!_playersSwitched)
                 _isHoldingFire = true;
         }
         else
-        {
             _isHoldingFire = false;
-        }
         if(context.canceled && _canInput)
         {
             if (!_playersSwitched)
@@ -31,9 +35,7 @@ public class ActivePlayerWeapon : MonoBehaviour
                 activePlayerWeapon.SingleFire();
             }
             else
-            {
                 _playersSwitched = false;
-            }
         }
         activePlayerWeapon.HoldingFire(_isHoldingFire);
     }
@@ -42,7 +44,7 @@ public class ActivePlayerWeapon : MonoBehaviour
         if (context.performed && _canInput)
         {
             _mouseScrollValue = context.ReadValue<float>();
-            PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
+            PlayerHeldWeapons activePlayerWeapon = _playerManager.GetCurrentPlayer.WeaponHolder;
             activePlayerWeapon.SwitchWeapon(_mouseScrollValue);
         }
     }
@@ -50,7 +52,7 @@ public class ActivePlayerWeapon : MonoBehaviour
     {
         if (context.performed && _canInput)
         {
-            PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
+            PlayerHeldWeapons activePlayerWeapon = _playerManager.GetCurrentPlayer.WeaponHolder;
             activePlayerWeapon.Reload();
         }
     }
@@ -58,24 +60,26 @@ public class ActivePlayerWeapon : MonoBehaviour
     {
         if (context.performed && _canInput)
         {
-            PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
+            PlayerHeldWeapons activePlayerWeapon = _playerManager.GetCurrentPlayer.WeaponHolder;
             if(activePlayerWeapon.GrenadeAmount > 0)
             {
                 activePlayerWeapon.ThrowGrenade();
-                GetComponent<ActivePlayerInput>().SetCanMove(false);
-                _manager.TimeCanPass(false);
-                _manager.PlayerHasDoneAction();
+                OnThrow?.Invoke(false);
                 _canInput = false;
             }
         }
     }
-    public void SetCanMakeInput(bool canInput)
+    private void ChangeInput(bool active)
     {
-        _canInput = canInput;
-        if (!canInput)
+        _canInput = active;
+        if (!active)
         {
-            PlayerHeldWeapons activePlayerWeapon = _manager.GetCurrentPlayer().WeaponHolder;
+            PlayerHeldWeapons activePlayerWeapon = _playerManager.GetCurrentPlayer.WeaponHolder;
             activePlayerWeapon.HoldingFire(false);
         }
+    }
+    private void OnDisable()
+    {
+        TurnManager.TurnInstance.OnTurnEnding -= ChangeInput;
     }
 }
