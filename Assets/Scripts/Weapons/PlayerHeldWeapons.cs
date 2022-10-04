@@ -18,7 +18,7 @@ public class PlayerHeldWeapons : MonoBehaviour
     [SerializeField] private WeaponTrajectory _trajectory;
     [SerializeField] private PlayerManager _manager;
     [SerializeField] private Image _activeWeaponImage;
-    [SerializeField] private TextMeshProUGUI _ammoText;
+    [SerializeField] private TextMeshProUGUI _ammoText, _grenadeAmountText;
     private int _grenadeAmount = 1;
     private bool _canFire;
     private List<PlayerWeapon> _activatedWeapons = new List<PlayerWeapon>();
@@ -32,6 +32,10 @@ public class PlayerHeldWeapons : MonoBehaviour
         _selectedWeaponIndex = 0;
         _canFire = true;
         _activeWeaponImage.sprite = _selectedWeapon.Image;
+    }
+    private void Start()
+    {
+        PlayerManager.Instance.OnGameEnded += DisableUi;
     }
     private void Update()
     {
@@ -120,10 +124,12 @@ public class PlayerHeldWeapons : MonoBehaviour
         string currentAmmoText = currentAmmo.ToString();
         string maxAmmoText = maxAmmo.ToString();
         _ammoText.text = currentAmmoText + "/" + maxAmmoText;
+        _grenadeAmountText.text = _grenadeAmount.ToString();
     }
     public void ThrowGrenade()
     {
         GameObject grenade = Instantiate(_grenadePrefab, _exit.position, Quaternion.identity);
+        PlayerManager.Instance.FocusCamOnGrenade(grenade.transform);
         Rigidbody body = grenade.GetComponent<Rigidbody>();
         body.AddForce(transform.forward * _throwForce);
         _grenadeAmount--;
@@ -146,5 +152,14 @@ public class PlayerHeldWeapons : MonoBehaviour
     public void AddGrenades()
     {
         _grenadeAmount += 2;
+    }
+    void DisableUi(int _int)
+    {
+        _ammoText.gameObject.SetActive(false);
+        _grenadeAmountText.gameObject.SetActive(false);
+    }
+    private void OnDisable()
+    {
+        PlayerManager.Instance.OnGameEnded -= DisableUi;
     }
 }

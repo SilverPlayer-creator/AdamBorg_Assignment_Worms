@@ -11,6 +11,7 @@ public class TurnManager : MonoBehaviour
     public static TurnManager TurnInstance;
     [SerializeField] private float _maxTimeLimit;
     [SerializeField] private Image _timeLimitImage;
+    [SerializeField] private GameObject _timeLimitObject;
     [SerializeField] private PlayerInput _inputSystem;
     [SerializeField] private PlayerManager _playerManager;
     private ActivePlayerWeapon _weaponInput;
@@ -32,7 +33,7 @@ public class TurnManager : MonoBehaviour
         _weaponInput = GetComponent<ActivePlayerWeapon>();
         _weaponInput.OnThrow += StopTime;
         GetComponent<ActivePlayerInput>().OnRoundStart += StartRound;
-
+        _playerManager.OnGameEnded += EndGame;
     }
     private void Update()
     {
@@ -43,14 +44,17 @@ public class TurnManager : MonoBehaviour
             else
             {
                 _checkIfFalling = 0;
-                _timeCanPass = true;
             }
         }
+        if (_checkIfFalling >= 5)
+            _timeCanPass = false;
         if (_timeCanPass)
+        {
             _currentTimeLimit -= Time.deltaTime;
+            _timeLimitImage.fillAmount = (_currentTimeLimit / _maxTimeLimit);
+        }
         if (_currentTimeLimit <= 0 && !_turnIsEnding)
             StartCoroutine(EndCurrentTurn());
-        _timeLimitImage.fillAmount = (_currentTimeLimit / _maxTimeLimit);
         if (_checkIfFalling >= 5 || _playerHasDoneAction)
             _timeCanPass = false;
         if (Input.GetKeyDown(KeyCode.T))
@@ -59,6 +63,7 @@ public class TurnManager : MonoBehaviour
     private IEnumerator EndCurrentTurn()
     {
         _turnIsEnding = true;
+        _timeCanPass = false;
         InvokeTurnEnd(false);
         Debug.Log("End turn");
         while (true)
@@ -103,5 +108,9 @@ public class TurnManager : MonoBehaviour
     {
         _roundHasStarted = true;
         _timeCanPass = true;
+    }
+    void EndGame(int _int)
+    {
+        _timeCanPass = false;
     }
 }

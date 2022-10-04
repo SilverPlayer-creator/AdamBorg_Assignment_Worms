@@ -16,6 +16,7 @@ public class ActivePlayer : MonoBehaviour
     public PlayerHeldWeapons WeaponHolder { get { return _weaponHolder; } }
     private CharacterController _controller;
     private PlayerHeldWeapons _weaponHolder;
+
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();

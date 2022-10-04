@@ -10,12 +10,18 @@ public class SceneManagement : MonoBehaviour
     {
         SceneManager.LoadScene(sceneIndex);
     }
-    public void Quit()
+    public void SetPlayerAmount(int playerAmount)
+    {
+        PlayerPrefs.SetInt("PlayerAmount", playerAmount);
+        SceneManager.LoadScene("SampleScene");
+    }
+    public void QuitGame()
     {
         Application.Quit();
     }
     public void ReloadScene()
     {
-        SceneManager.LoadScene(0);
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
     }
 }

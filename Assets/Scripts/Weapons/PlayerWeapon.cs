@@ -8,10 +8,6 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private WeaponData _data;
     [SerializeField] private Transform _barrel;
     public Sprite Image { get { return _data.Icon; } }
-    public delegate void FireDelegate(int timeDecrease);
-    public event FireDelegate OnFireEvent;
-    public delegate void ReloadDelegate();
-    public event ReloadDelegate OnReload;
     private int _currentDamage;
     private int _currentAmmo;
     private float _nextShootTime;
@@ -36,11 +32,7 @@ public class PlayerWeapon : MonoBehaviour
     {
         if(_currentAmmo > 0)
         {
-            //GameObject bullet = Instantiate(_data.Prefab, _barrel.position, Quaternion.identity);
-            //bullet.GetComponent<WeaponProjectile>().Initialize(_currentDamage);
-            //Rigidbody body = bullet.GetComponent<Rigidbody>();
-            //body.AddForce(transform.forward * _data.Force);
-            GameObject projectile = ProjectilePooler.PoolInstance.SpawnFromPool(_data.WeaponName, _barrel.position, Quaternion.identity);
+            GameObject projectile = ProjectilePooler.PoolInstance.SpawnFromPool(_data.WeaponName, _barrel.position, _data.Prefab.transform.rotation);
             projectile.GetComponent<Rigidbody>().AddForce(_barrel.transform.forward * _data.Force);
             projectile.GetComponent<WeaponProjectile>().Initialize(_currentDamage);
             _nextShootTime = Time.time + 1f / _data.FireRate;
@@ -49,9 +41,7 @@ public class PlayerWeapon : MonoBehaviour
             AudioManager.AudioInstance().PlaySound(_data.WeaponName);
         }
         else
-        {
             Reload();
-        }
     }
     public void Reload()
     {

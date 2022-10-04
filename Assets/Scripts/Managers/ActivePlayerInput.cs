@@ -24,6 +24,7 @@ public class ActivePlayerInput : MonoBehaviour
         StartCoroutine(RoundStart());
         TurnManager.TurnInstance.OnTurnEnding += ChangeInput;
         GetComponent<ActivePlayerWeapon>().OnThrow += ChangeInput;
+        _manager.OnGameEnded += DisableInput;
     }
 
     void FixedUpdate()
@@ -92,10 +93,16 @@ public class ActivePlayerInput : MonoBehaviour
         if (!active)
             _moveValue = Vector2.zero;
     }
+    void DisableInput(int _int)
+    {
+        _canMove = false;
+        _moveValue = Vector2.zero;
+    }
     private void OnDisable()
     {
         TurnManager.TurnInstance.OnTurnEnding -= ChangeInput;
         GetComponent<ActivePlayerWeapon>().OnThrow -= ChangeInput;
+        _manager.OnGameEnded -= DisableInput;
     }
     IEnumerator RoundStart()
     {

@@ -8,21 +8,11 @@ public class SetPlayers : MonoBehaviour
 {
     public void SetPlayerAmount(int playerAmount)
     {
-        switch (playerAmount)
-        {
-            case 2:
-                PlayerPrefs.SetInt("PlayerAmount", 2);
-                break;
-
-            case 3:
-                PlayerPrefs.SetInt("PlayerAmount", 3);
-                break;
-            case 4:
-                PlayerPrefs.SetInt("PlayerAmount", 4);
-                break;
-            default:
-                break;
-        }
+        PlayerPrefs.SetInt("PlayerAmount", playerAmount);
         SceneManager.LoadScene("SampleScene");
+    }
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }

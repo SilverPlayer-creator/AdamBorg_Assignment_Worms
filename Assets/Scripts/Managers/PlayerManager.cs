@@ -6,21 +6,21 @@ using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
-    public delegate void GameEnd();
+    public delegate void GameEnd(int victoryPlayer);
     public event GameEnd OnGameEnded;
+    public static PlayerManager Instance { get { return _instance; } }
     [SerializeField] private List<ActivePlayer> _players;
     [SerializeField] private CameraFollow _mainCamera;
+    [SerializeField] private Transform _playerEndPosition;
     private static PlayerManager _instance;
     private int _currentPlayerIndex;
     private List<ActivePlayer> _activePlayers = new List<ActivePlayer>();
     private int _amountOfPlayers;
     private ActivePlayer _currentPlayer;
     private bool _gameResultReached;
-    private SceneManagement _sceneManager;
     private TurnManager _turnManager;
     private void Awake()
     {
-        _sceneManager = GetComponent<SceneManagement>();
         _turnManager = GetComponent<TurnManager>();
         _turnManager.OnTurnEnding += ChangeActivePlayer;
         if (_instance == null)
@@ -49,16 +49,32 @@ public class PlayerManager : MonoBehaviour
     public List<ActivePlayer> GetAllPlayers => _activePlayers;
     private IEnumerator GameEnded()
     {
-        OnGameEnded?.Invoke();
+        int victoryInt = 0;
+        ChangeActivePlayer(true);
+        _currentPlayer.Controller.enabled = false;
+        _currentPlayer.transform.position = _playerEndPosition.position;
+        _currentPlayer.Controller.enabled = true;
+        for (int i = 0; i < _players.Count; i++)
+        {
+            if (_currentPlayer == _players[i])
+            {
+                Debug.Log("The player that won is player " + i);
+                victoryInt = i + 1;
+            }
+        }
+        OnGameEnded?.Invoke(victoryInt);
+        Debug.Log("Invoke");
         _gameResultReached = true;
-        yield return new WaitForSeconds(5f);
-        _sceneManager.ReloadScene();
+        yield return new WaitForSeconds(2f);
     }
     private void RemoveDeadPlayer(ActivePlayer playerToRemove)
     {
         _activePlayers.Remove(playerToRemove);
         if (_activePlayers.Count == 1 && !_gameResultReached)
+        {
+            Debug.Log("End game");
             StartCoroutine(GameEnded());
+        }
     }
     private void ChangeActivePlayer(bool newTurn)
     {
@@ -72,5 +88,9 @@ public class PlayerManager : MonoBehaviour
             _mainCamera.ChangePlayer(_currentPlayer.transform);
             _currentPlayer.WeaponHolder.NewTurn();
         }
+    }
+    public void FocusCamOnGrenade(Transform grenade)
+    {
+        _mainCamera.LookAtGrenade(grenade);
     }
 }

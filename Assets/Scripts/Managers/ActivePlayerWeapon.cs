@@ -11,11 +11,13 @@ public class ActivePlayerWeapon : MonoBehaviour
     [SerializeField] private PlayerManager _playerManager;
     private bool _isHoldingFire;
     private float _mouseScrollValue;
-    private bool _canInput = true;
+    private bool _canInput = false;
     private bool _playersSwitched;
-    private void Awake()
+    private void Start()
     {
         TurnManager.TurnInstance.OnTurnEnding += ChangeInput;
+        GetComponent<ActivePlayerInput>().OnRoundStart += EnableInput;
+        _playerManager.OnGameEnded += DisableInput;
     }
     public void Fire(InputAction.CallbackContext context)
     {
@@ -78,8 +80,19 @@ public class ActivePlayerWeapon : MonoBehaviour
             activePlayerWeapon.HoldingFire(false);
         }
     }
+    //Different events need to access the inputs, but they need different parameters...easy fix?
+    private void EnableInput()
+    {
+        _canInput = true;
+    }
+    private void DisableInput(int _int)
+    {
+        _canInput = false;
+    }
     private void OnDisable()
     {
         TurnManager.TurnInstance.OnTurnEnding -= ChangeInput;
+        GetComponent<ActivePlayerInput>().OnRoundStart -= EnableInput;
+        _playerManager.OnGameEnded -= DisableInput;
     }
 }

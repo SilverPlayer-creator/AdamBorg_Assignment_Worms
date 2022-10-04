@@ -6,6 +6,7 @@ public class Rocket : WeaponProjectile
 {
     [SerializeField] private float _explosionRadius;
     [SerializeField] private LayerMask _playerLayer;
+    [SerializeField] private GameObject _explosion;
     private void OnCollisionEnter(Collision collision)
     {
         ActivePlayerHealth player = collision.gameObject.GetComponent<ActivePlayerHealth>();
@@ -25,6 +26,7 @@ public class Rocket : WeaponProjectile
                 Debug.Log("Player caught in radius");
             }
         }
+        GameObject explosion = Instantiate(_explosion, transform.position, Quaternion.identity);
         gameObject.SetActive(false);
     }
 }

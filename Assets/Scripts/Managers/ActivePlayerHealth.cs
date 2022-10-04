@@ -26,6 +26,7 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
         _currentHealth = _maxHealth;
         _healthBar.fillAmount = 1;
         _currentHealth = _maxHealth;
+        PlayerManager.Instance.OnGameEnded += DisableUi;
     }
     public void TakeDamage(int damage)
     {
@@ -50,5 +51,14 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
             _currentHealth = _maxHealth;
         }
         _healthBar.fillAmount = (float)_currentHealth / (float)_maxHealth;
+    }
+    void DisableUi(int _int)
+    {
+        if (_playerUI.activeSelf)
+            _playerUI.gameObject.SetActive(false);
+    }
+    private void OnDisable()
+    {
+        PlayerManager.Instance.OnGameEnded -= DisableUi;
     }
 }

@@ -29,8 +29,9 @@ public class PickupManager : MonoBehaviour
         OnPickup += EnableLocation;
         foreach (Transform transform in _transforms)
             _pickupDict.Add(transform.position, true);
-        foreach (var item in _pickupDict)
-            Debug.Log(item.Key + " " + item.Value);
+    }
+    private void Start()
+    {
         TurnManager.TurnInstance.OnTurnEnding += TryToSpawn;
     }
     public static PickupManager GetInstance => _instance;
@@ -62,18 +63,21 @@ public class PickupManager : MonoBehaviour
         yield return new WaitForSeconds(4f);
         _text.gameObject.SetActive(false);
     }
-    public void TryToSpawn(bool _bool)
+    public void TryToSpawn(bool turnEnded)
     {
-        int randomValue = Random.Range(1, _chanceToSpawn);
-        if(randomValue <= 20)
+        if (turnEnded)
         {
-            Spawn();
-            _chanceToSpawn = _defaultChance;
-        }
-        else
-        {
-            Debug.Log("Random value was: " + randomValue + ", no spawn");
-            _chanceToSpawn -= 20;
+            int randomValue = Random.Range(1, _chanceToSpawn);
+            if (randomValue <= 20)
+            {
+                Spawn();
+                _chanceToSpawn = _defaultChance;
+            }
+            else
+            {
+                Debug.Log("Random value was: " + randomValue + ", no spawn");
+                _chanceToSpawn -= 20;
+            }
         }
     }
     public void InvokePickup(Vector3 pos)

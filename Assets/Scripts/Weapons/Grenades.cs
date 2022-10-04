@@ -9,6 +9,8 @@ public class Grenades : MonoBehaviour
     [SerializeField] private float _timer;
     [SerializeField] private float _explosionRadius;
     [SerializeField] private LayerMask _playerLayer;
+    [SerializeField] private GameObject _mesh;
+    [SerializeField] private GameObject _explosion;
     private bool _exploded;
     void Update()
     {
@@ -32,6 +34,7 @@ public class Grenades : MonoBehaviour
                 _exploded = true;
             }
         }
+        Debug.Log(GetComponent<Rigidbody>().velocity);
     }
     private void OnDrawGizmos()
     {
@@ -39,8 +42,16 @@ public class Grenades : MonoBehaviour
     }
     private IEnumerator Explode()
     {
-        GetComponent<MeshRenderer>().enabled = false;
+        _mesh.SetActive(false);
+        AudioManager.AudioInstance().PlaySound("GrenadeExp");
+        GameObject explosion = Instantiate(_explosion, transform.position, Quaternion.identity);
+        Rigidbody body = GetComponent<Rigidbody>();
+        body.velocity = Vector3.zero;
+        body.drag = 50;
+        body.isKinematic = true;
+        yield return new WaitForSeconds(3f);
+        TurnManager.TurnInstance.QuickEnd();
         yield return new WaitForSeconds(1f);
-        TurnManager.TurnInstance.InvokeTurnEnd(true);
+        Destroy(gameObject);
     }
 }
