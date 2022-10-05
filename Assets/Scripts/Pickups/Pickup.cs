@@ -5,9 +5,9 @@ using UnityEngine;
 [System.Serializable]
 public class Pickup : MonoBehaviour
 {
-    private enum _typeOfPickup { health, grenade, damage, rocket }
     [SerializeField] private _typeOfPickup _type;
     [SerializeField] private int _value;
+    private enum _typeOfPickup { health, grenade, damage, rocket }
     private void OnTriggerEnter(Collider other)
     {
         ActivePlayer player = other.GetComponent<ActivePlayer>();
@@ -22,14 +22,17 @@ public class Pickup : MonoBehaviour
 
                 case _typeOfPickup.damage:
                     player.WeaponHolder.IncreaseDamage(_value);
+                    AudioManager.AudioInstance().PlaySound("DamagePick");
                     break;
 
                 case _typeOfPickup.grenade:
                     player.WeaponHolder.AddGrenades();
+                    AudioManager.AudioInstance().PlaySound("GrenadePick");
                     break;
 
                 case _typeOfPickup.rocket:
                     player.WeaponHolder.AddWeapon("Rocket");
+                    AudioManager.AudioInstance().PlaySound("RocketPick");
                     break;
 
                 default:

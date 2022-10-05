@@ -11,7 +11,8 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if(_audioInstance == null)
+        Debug.Log("Audio manager Awake");
+        if (_audioInstance == null)
         {
             _audioInstance = this;
         }
@@ -31,7 +32,7 @@ public class AudioManager : MonoBehaviour
         {
             if(soundName == sound.SoundName)
             {
-                _source.PlayOneShot(sound.SoundClip);
+                _source.PlayOneShot(sound.SoundClip, 0.5f);
             }
         }
     }

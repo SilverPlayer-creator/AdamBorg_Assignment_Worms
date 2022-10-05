@@ -6,23 +6,25 @@ using UnityEngine.InputSystem;
 
 public class TurnManager : MonoBehaviour
 {
-    public delegate void TurnEnd(bool hasEnded);
+    public delegate void TurnEnd(bool turnHasEnded);
     public event TurnEnd OnTurnEnding;
+    public delegate void CountDown(int countDown);
+    public event CountDown OnCountDown;
     public static TurnManager TurnInstance;
     [SerializeField] private float _maxTimeLimit;
     [SerializeField] private Image _timeLimitImage;
-    [SerializeField] private GameObject _timeLimitObject;
-    [SerializeField] private PlayerInput _inputSystem;
-    [SerializeField] private PlayerManager _playerManager;
     private ActivePlayerWeapon _weaponInput;
-    private float _checkIfFalling;
+    private float _timeToRoundStart = 1;
+    private float _timeNotGrounded;
     private float _currentTimeLimit;
     private bool _timeCanPass;
     private bool _turnIsEnding;
     private bool _playerHasDoneAction;
     private bool _roundHasStarted;
+    private int _countDown = 5;
     private void Awake()
     {
+        Debug.Log("Turn manager Awake");
         _currentTimeLimit = _maxTimeLimit;
         _roundHasStarted = false;
 
@@ -32,22 +34,18 @@ public class TurnManager : MonoBehaviour
             Destroy(this);
         _weaponInput = GetComponent<ActivePlayerWeapon>();
         _weaponInput.OnThrow += StopTime;
-        GetComponent<ActivePlayerInput>().OnRoundStart += StartRound;
-        _playerManager.OnGameEnded += EndGame;
+        PlayerManager.Instance.OnGameEnded += EndGame;
     }
     private void Update()
     {
         if (_roundHasStarted)
         {
-            if (!_playerManager.GetCurrentPlayer.IsGrounded() && !_playerHasDoneAction)
-                _checkIfFalling += Time.deltaTime;
-            else
-            {
-                _checkIfFalling = 0;
-            }
+            CheckIfFalling();
         }
-        if (_checkIfFalling >= 5)
-            _timeCanPass = false;
+        else
+        {
+            CountDownUpdate();
+        }
         if (_timeCanPass)
         {
             _currentTimeLimit -= Time.deltaTime;
@@ -55,9 +53,9 @@ public class TurnManager : MonoBehaviour
         }
         if (_currentTimeLimit <= 0 && !_turnIsEnding)
             StartCoroutine(EndCurrentTurn());
-        if (_checkIfFalling >= 5 || _playerHasDoneAction)
+        if (_timeNotGrounded >= 5 || _playerHasDoneAction)
             _timeCanPass = false;
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.T) && !_turnIsEnding && !_playerHasDoneAction)
             StartCoroutine(EndCurrentTurn());
     }
     private IEnumerator EndCurrentTurn()
@@ -65,10 +63,9 @@ public class TurnManager : MonoBehaviour
         _turnIsEnding = true;
         _timeCanPass = false;
         InvokeTurnEnd(false);
-        Debug.Log("End turn");
         while (true)
         {
-            if (_playerManager.GetCurrentPlayer.IsGrounded())
+            if (PlayerManager.Instance.GetCurrentPlayer.IsGrounded())
                 break;
             yield return new WaitForSeconds(0.1f);
         }
@@ -98,6 +95,7 @@ public class TurnManager : MonoBehaviour
     }
     public void InvokeTurnEnd(bool hasEnded)
     {
+        if(!PlayerManager.Instance.GameHasEnded)
         OnTurnEnding?.Invoke(hasEnded);
     }
     public void QuickEnd()
@@ -108,9 +106,36 @@ public class TurnManager : MonoBehaviour
     {
         _roundHasStarted = true;
         _timeCanPass = true;
+        Debug.Log("Start round");
     }
-    void EndGame(int _int)
+    void CountDownUpdate()
+    {
+        _timeToRoundStart -= Time.deltaTime;
+        if (_timeToRoundStart <= 0)
+        {
+            if (_countDown > 0)
+            {
+                _countDown--;
+                _timeToRoundStart = 1;
+            }
+            else
+            {
+                StartRound();
+            }
+            OnCountDown?.Invoke(_countDown);
+        }
+    }
+    void EndGame()
     {
         _timeCanPass = false;
+    }
+    void CheckIfFalling()
+    {
+        if (!PlayerManager.Instance.GetCurrentPlayer.IsGrounded() && !_playerHasDoneAction)
+            _timeNotGrounded += Time.deltaTime;
+        else
+        {
+            _timeNotGrounded = 0;
+        }
     }
 }

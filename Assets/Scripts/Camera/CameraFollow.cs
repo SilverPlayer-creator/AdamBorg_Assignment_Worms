@@ -9,17 +9,13 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float _smoothness;
     [SerializeField] private Transform _lookTarget;
     [SerializeField] private Transform _followTarget;
+    [SerializeField] private float _maxX, _maxZ, _minX, _minZ;
     private Vector3 _grenadeOffset;
     private bool _followingGrenade;
-    private bool _rotate;
-
-    private void Start()
-    {
-
-    }
+    private bool _gameHasEnded;
     private void FixedUpdate()
     {
-        if (!_followingGrenade)
+        if (!_followingGrenade && !_gameHasEnded)
         {
             Vector3 desiredPos = _followTarget.position;
             Vector3 follow = Vector3.Lerp(transform.position, desiredPos, _smoothness * Time.fixedDeltaTime);
@@ -49,7 +45,7 @@ public class CameraFollow : MonoBehaviour
         Vector3 newPos = new Vector3();
         newPos.x = Random.Range(-2f, 2f);
         newPos.y = Random.Range(1f, 5f);
-        newPos.z = 1.5f;
+        newPos.z = Random.Range(3f, 6f);
         return newPos;
     }
 }

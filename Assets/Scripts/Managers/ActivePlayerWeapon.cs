@@ -16,8 +16,8 @@ public class ActivePlayerWeapon : MonoBehaviour
     private void Start()
     {
         TurnManager.TurnInstance.OnTurnEnding += ChangeInput;
-        GetComponent<ActivePlayerInput>().OnRoundStart += EnableInput;
-        _playerManager.OnGameEnded += DisableInput;
+        GetComponent<ActivePlayerInput>().OnRoundStart += () => ChangeInput(true);
+        _playerManager.OnGameEnded += () => ChangeInput(false);
     }
     public void Fire(InputAction.CallbackContext context)
     {
@@ -73,6 +73,7 @@ public class ActivePlayerWeapon : MonoBehaviour
     }
     private void ChangeInput(bool active)
     {
+        Debug.Log("Weapon input set to " + active);
         _canInput = active;
         if (!active)
         {
@@ -80,19 +81,10 @@ public class ActivePlayerWeapon : MonoBehaviour
             activePlayerWeapon.HoldingFire(false);
         }
     }
-    //Different events need to access the inputs, but they need different parameters...easy fix?
-    private void EnableInput()
-    {
-        _canInput = true;
-    }
-    private void DisableInput(int _int)
-    {
-        _canInput = false;
-    }
     private void OnDisable()
     {
         TurnManager.TurnInstance.OnTurnEnding -= ChangeInput;
-        GetComponent<ActivePlayerInput>().OnRoundStart -= EnableInput;
-        _playerManager.OnGameEnded -= DisableInput;
+        GetComponent<ActivePlayerInput>().OnRoundStart -= () => ChangeInput(true);
+        _playerManager.OnGameEnded -= () => ChangeInput(false);
     }
 }

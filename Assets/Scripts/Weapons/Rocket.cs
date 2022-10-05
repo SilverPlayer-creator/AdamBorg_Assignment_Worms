@@ -27,6 +27,7 @@ public class Rocket : WeaponProjectile
             }
         }
         GameObject explosion = Instantiate(_explosion, transform.position, Quaternion.identity);
+        AudioManager.AudioInstance().PlaySound("RocketCollide");
         gameObject.SetActive(false);
     }
 }

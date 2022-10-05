@@ -52,7 +52,7 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
         }
         _healthBar.fillAmount = (float)_currentHealth / (float)_maxHealth;
     }
-    void DisableUi(int _int)
+    void DisableUi()
     {
         if (_playerUI.activeSelf)
             _playerUI.gameObject.SetActive(false);

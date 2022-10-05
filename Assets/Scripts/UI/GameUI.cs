@@ -4,23 +4,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class GameEnd : MonoBehaviour
+public class GameUI : MonoBehaviour
 {
     [SerializeField] private PlayerManager _playerManager;
     [SerializeField] private Animator _anim;
     [SerializeField] private GameObject[] _uiToTurnOff;
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private TextMeshProUGUI _winnerText;
-    private int _victoryInt;
+    [SerializeField] private TextMeshProUGUI _startText;
+    private bool _roundStarted;
     private void Start()
     {
         _playerManager.OnGameEnded += StartFadeIn;
+        TurnManager.TurnInstance.OnCountDown += ChangeStartText;
     }
-    void StartFadeIn(int victoryInt)
+    void StartFadeIn()
     {
         Debug.Log("Start fade in");
         StartCoroutine(FadeIn());
-        _victoryInt = victoryInt;
     }
     IEnumerator FadeIn()
     {
@@ -33,7 +34,27 @@ public class GameEnd : MonoBehaviour
         yield return new WaitForSeconds(2f);
         _anim.SetTrigger("FadeOut");
         _gameOverPanel.SetActive(true);
-        _winnerText.text = "Player " + _victoryInt.ToString() + " wins!";
+        _winnerText.text = "Player " + PlayerManager.Instance.VictoryInt.ToString() + " wins!";
+    }
+    void ChangeStartText(int countDown)
+    {
+        if(countDown > 0)
+        {
+            _startText.text = "Round Starts In " + "\n" + countDown.ToString();
+            AudioManager.AudioInstance().PlaySound("CountDown");
+        }
+        else if(countDown <= 0 && !_roundStarted)
+        {
+            AudioManager.AudioInstance().PlaySound("RoundStart");
+            StartCoroutine(RemoveText());
+        }
+    }
+    IEnumerator RemoveText()
+    {
+        _startText.text = "START!";
+        _roundStarted = true;
+        yield return new WaitForSeconds(1f);
+        _startText.gameObject.SetActive(false);
     }
     private void OnDisable()
     {

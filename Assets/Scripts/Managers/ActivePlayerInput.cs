@@ -7,7 +7,8 @@ public class ActivePlayerInput : MonoBehaviour
 {
     public delegate void RoundStartDelegate();
     public event RoundStartDelegate OnRoundStart;
-    [SerializeField] private PlayerManager _manager;
+    [SerializeField] private PlayerManager _playerManager;
+    [SerializeField] private TurnManager _turnManager;
     [Header("Movement Input")]
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _rotateSpeed;
@@ -21,15 +22,16 @@ public class ActivePlayerInput : MonoBehaviour
     private Vector3 _otherPlayerVelocity;
     void Start()
     {
-        StartCoroutine(RoundStart());
-        TurnManager.TurnInstance.OnTurnEnding += ChangeInput;
+        _turnManager.OnTurnEnding += ChangeInput;
         GetComponent<ActivePlayerWeapon>().OnThrow += ChangeInput;
-        _manager.OnGameEnded += DisableInput;
+        _playerManager.OnGameEnded += () => ChangeInput(false);
+        _turnManager.OnCountDown += RoundStart;
+        AudioManager.AudioInstance().PlaySound("RobotStart");
     }
 
     void FixedUpdate()
     {
-        ActivePlayer currentPlayer = _manager.GetCurrentPlayer;
+        ActivePlayer currentPlayer = _playerManager.GetCurrentPlayer;
         CharacterController controller = currentPlayer.Controller;
         if (_canMove)
         {
@@ -38,6 +40,7 @@ public class ActivePlayerInput : MonoBehaviour
             if (currentPlayer.IsGrounded() && _pressedJump)
             {
                 _currentPlayerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
+                AudioManager.AudioInstance().PlaySound("Jump");
             }
             controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
         }
@@ -48,7 +51,7 @@ public class ActivePlayerInput : MonoBehaviour
 
         _currentPlayerVelocity.y += _gravity * Time.fixedDeltaTime;
         _otherPlayerVelocity.y += _gravity * Time.fixedDeltaTime;
-        List<ActivePlayer> allPlayers = _manager.GetAllPlayers;
+        List<ActivePlayer> allPlayers = _playerManager.GetAllPlayers;
         for (int i = 0; i < allPlayers.Count; i++)
         {
             if (allPlayers[i] != currentPlayer)
@@ -93,21 +96,18 @@ public class ActivePlayerInput : MonoBehaviour
         if (!active)
             _moveValue = Vector2.zero;
     }
-    void DisableInput(int _int)
+    private void RoundStart(int countDown)
     {
-        _canMove = false;
-        _moveValue = Vector2.zero;
+        if(countDown <= 0)
+        {
+            _canMove = true;
+            OnRoundStart?.Invoke();
+        }
     }
     private void OnDisable()
     {
-        TurnManager.TurnInstance.OnTurnEnding -= ChangeInput;
+        _turnManager.OnTurnEnding -= ChangeInput;
         GetComponent<ActivePlayerWeapon>().OnThrow -= ChangeInput;
-        _manager.OnGameEnded -= DisableInput;
-    }
-    IEnumerator RoundStart()
-    {
-        yield return new WaitForSeconds(5f);
-        _canMove = true;
-        OnRoundStart?.Invoke();
+        _playerManager.OnGameEnded -= () => ChangeInput(false);
     }
 }

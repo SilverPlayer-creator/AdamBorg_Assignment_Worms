@@ -6,22 +6,24 @@ using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
-    public delegate void GameEnd(int victoryPlayer);
+    public delegate void GameEnd();
     public event GameEnd OnGameEnded;
     public static PlayerManager Instance { get { return _instance; } }
     [SerializeField] private List<ActivePlayer> _players;
+    [SerializeField] private List<GameObject> _lineRenderers;
     [SerializeField] private CameraFollow _mainCamera;
     [SerializeField] private Transform _playerEndPosition;
+    [SerializeField] private TurnManager _turnManager;
     private static PlayerManager _instance;
-    private int _currentPlayerIndex;
     private List<ActivePlayer> _activePlayers = new List<ActivePlayer>();
-    private int _amountOfPlayers;
     private ActivePlayer _currentPlayer;
-    private bool _gameResultReached;
-    private TurnManager _turnManager;
+    private bool _gameHasEnded;
+    private int _victoryIndex;
+    private int _amountOfPlayers;
+    private int _currentPlayerIndex;
     private void Awake()
     {
-        _turnManager = GetComponent<TurnManager>();
+        Debug.Log("Player manager Awake");
         _turnManager.OnTurnEnding += ChangeActivePlayer;
         if (_instance == null)
             _instance = this;
@@ -37,7 +39,10 @@ public class PlayerManager : MonoBehaviour
                 _activePlayers.Add(_players[i]);
 
             if(i > _amountOfPlayers - 1)
+            {
                 _players[i].gameObject.SetActive(false);
+                _lineRenderers[i].SetActive(false);
+            }
             foreach (ActivePlayer player in _activePlayers)
             {
                 ActivePlayerHealth playerHealth = player.PlayerHealth;
@@ -49,7 +54,6 @@ public class PlayerManager : MonoBehaviour
     public List<ActivePlayer> GetAllPlayers => _activePlayers;
     private IEnumerator GameEnded()
     {
-        int victoryInt = 0;
         ChangeActivePlayer(true);
         _currentPlayer.Controller.enabled = false;
         _currentPlayer.transform.position = _playerEndPosition.position;
@@ -59,18 +63,18 @@ public class PlayerManager : MonoBehaviour
             if (_currentPlayer == _players[i])
             {
                 Debug.Log("The player that won is player " + i);
-                victoryInt = i + 1;
+                _victoryIndex = i + 1;
             }
         }
-        OnGameEnded?.Invoke(victoryInt);
+        OnGameEnded?.Invoke();
         Debug.Log("Invoke");
-        _gameResultReached = true;
+        _gameHasEnded = true;
         yield return new WaitForSeconds(2f);
     }
     private void RemoveDeadPlayer(ActivePlayer playerToRemove)
     {
         _activePlayers.Remove(playerToRemove);
-        if (_activePlayers.Count == 1 && !_gameResultReached)
+        if (_activePlayers.Count == 1 && !_gameHasEnded)
         {
             Debug.Log("End game");
             StartCoroutine(GameEnded());
@@ -93,4 +97,6 @@ public class PlayerManager : MonoBehaviour
     {
         _mainCamera.LookAtGrenade(grenade);
     }
+    public int VictoryInt => _victoryIndex;
+    public bool GameHasEnded => _gameHasEnded;
 }

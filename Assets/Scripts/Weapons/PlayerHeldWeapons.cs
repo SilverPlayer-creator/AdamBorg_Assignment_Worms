@@ -16,7 +16,6 @@ public class PlayerHeldWeapons : MonoBehaviour
     [SerializeField] private float _throwForce;
     [SerializeField] private Transform _exit;
     [SerializeField] private WeaponTrajectory _trajectory;
-    [SerializeField] private PlayerManager _manager;
     [SerializeField] private Image _activeWeaponImage;
     [SerializeField] private TextMeshProUGUI _ammoText, _grenadeAmountText;
     private int _grenadeAmount = 1;
@@ -36,6 +35,7 @@ public class PlayerHeldWeapons : MonoBehaviour
     private void Start()
     {
         PlayerManager.Instance.OnGameEnded += DisableUi;
+        DisplayAmmo();
     }
     private void Update()
     {
@@ -44,12 +44,12 @@ public class PlayerHeldWeapons : MonoBehaviour
             if (_selectedWeapon.WeaponIsAutomatic && _holdingFire)
             {
                 _selectedWeapon.IsHoldingFire(_holdingFire);
+                DisplayAmmo();
             }
             else if (_selectedWeapon.WeaponIsAutomatic && !_holdingFire)
             {
                 _selectedWeapon.IsHoldingFire(false);
             }
-            DisplayAmmo();
         }
         Vector3 force = _selectedWeapon.GetForce * transform.forward;
         _trajectory.DrawTrajectory(force, _exit.position, _selectedWeapon.GetPrefab);
@@ -114,7 +114,7 @@ public class PlayerHeldWeapons : MonoBehaviour
             _canFire = true;
             _holdingFire = false;
         }
-        _activeWeaponImage.sprite = _manager.GetCurrentPlayer.WeaponHolder.SelectedWeapon.Image;
+        _activeWeaponImage.sprite = PlayerManager.Instance.GetCurrentPlayer.WeaponHolder.SelectedWeapon.Image;
     }
     void DisplayAmmo()
     {
@@ -133,6 +133,7 @@ public class PlayerHeldWeapons : MonoBehaviour
         Rigidbody body = grenade.GetComponent<Rigidbody>();
         body.AddForce(transform.forward * _throwForce);
         _grenadeAmount--;
+        DisplayAmmo();
     }
     public void IncreaseDamage(int increaseAmount)
     {
@@ -152,8 +153,9 @@ public class PlayerHeldWeapons : MonoBehaviour
     public void AddGrenades()
     {
         _grenadeAmount += 2;
+        DisplayAmmo();
     }
-    void DisableUi(int _int)
+    void DisableUi()
     {
         _ammoText.gameObject.SetActive(false);
         _grenadeAmountText.gameObject.SetActive(false);
