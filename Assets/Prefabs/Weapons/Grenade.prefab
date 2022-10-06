@@ -133,7 +133,7 @@ MonoBehaviour:
   _throwForce: 500
   _damage: 30
   _timer: 4
-  _explosionRadius: 2
+  _explosionRadius: 5
   _playerLayer:
     serializedVersion: 2
     m_Bits: 128

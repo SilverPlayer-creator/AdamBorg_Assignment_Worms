@@ -26,7 +26,7 @@ public class ActivePlayerInput : MonoBehaviour
         GetComponent<ActivePlayerWeapon>().OnThrow += ChangeInput;
         _playerManager.OnGameEnded += () => ChangeInput(false);
         _turnManager.OnCountDown += RoundStart;
-        AudioManager.AudioInstance().PlaySound("RobotStart");
+        AudioManager.Instance.PlaySound("RobotStart");
     }
 
     void FixedUpdate()
@@ -40,13 +40,13 @@ public class ActivePlayerInput : MonoBehaviour
             if (currentPlayer.IsGrounded() && _pressedJump)
             {
                 _currentPlayerVelocity.y = Mathf.Sqrt(_jumpForce * -2 * _gravity);
-                AudioManager.AudioInstance().PlaySound("Jump");
+                AudioManager.Instance.PlaySound("Jump");
             }
             controller.Move(move * _moveSpeed * Time.fixedDeltaTime);
         }
         if (currentPlayer.IsGrounded() && _currentPlayerVelocity.y < 0)
         {
-            _currentPlayerVelocity.y = -2f;
+            _currentPlayerVelocity.y = -4.5f; //prevents bumps going down slopes
         }
 
         _currentPlayerVelocity.y += _gravity * Time.fixedDeltaTime;

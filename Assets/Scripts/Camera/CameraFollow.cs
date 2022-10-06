@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] private Vector3 _distance;
-    [SerializeField] private Vector3 _rotation;
     [SerializeField] private float _smoothness;
     [SerializeField] private Transform _lookTarget;
     [SerializeField] private Transform _followTarget;

@@ -23,11 +23,10 @@ public class Rocket : WeaponProjectile
             {
                 player.TakeDamage(_damage);
                 hitPlayers.Add(_player);
-                Debug.Log("Player caught in radius");
             }
         }
         GameObject explosion = Instantiate(_explosion, transform.position, Quaternion.identity);
-        AudioManager.AudioInstance().PlaySound("RocketCollide");
+        AudioManager.Instance.PlaySound("RocketCollide");
         gameObject.SetActive(false);
     }
 }

@@ -73,7 +73,6 @@ public class ActivePlayerWeapon : MonoBehaviour
     }
     private void ChangeInput(bool active)
     {
-        Debug.Log("Weapon input set to " + active);
         _canInput = active;
         if (!active)
         {

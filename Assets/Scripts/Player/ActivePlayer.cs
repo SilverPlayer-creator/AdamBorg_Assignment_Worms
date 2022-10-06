@@ -16,6 +16,7 @@ public class ActivePlayer : MonoBehaviour
     public PlayerHeldWeapons WeaponHolder { get { return _weaponHolder; } }
     private CharacterController _controller;
     private PlayerHeldWeapons _weaponHolder;
+    private bool _isActivePlayer;
 
     private void Awake()
     {
@@ -30,4 +31,6 @@ public class ActivePlayer : MonoBehaviour
     {
         return Physics.CheckSphere(_groundCheck.position, checkRadius, _platform);
     }
+    public void SetIsActivePlayer(bool isActive) { _isActivePlayer = isActive; }
+    public bool IsActivePlayer() => _isActivePlayer;
 }

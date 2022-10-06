@@ -10,7 +10,6 @@ public class PlayerManager : MonoBehaviour
     public event GameEnd OnGameEnded;
     public static PlayerManager Instance { get { return _instance; } }
     [SerializeField] private List<ActivePlayer> _players;
-    [SerializeField] private List<GameObject> _lineRenderers;
     [SerializeField] private CameraFollow _mainCamera;
     [SerializeField] private Transform _playerEndPosition;
     [SerializeField] private TurnManager _turnManager;
@@ -23,7 +22,6 @@ public class PlayerManager : MonoBehaviour
     private int _currentPlayerIndex;
     private void Awake()
     {
-        Debug.Log("Player manager Awake");
         _turnManager.OnTurnEnding += ChangeActivePlayer;
         if (_instance == null)
             _instance = this;
@@ -31,6 +29,7 @@ public class PlayerManager : MonoBehaviour
             Destroy(this);
         _currentPlayerIndex = 0;
         _currentPlayer = _players[0];
+        _currentPlayer.SetIsActivePlayer(true);
         _amountOfPlayers = PlayerPrefs.GetInt("PlayerAmount");
 
         for (int i = 0; i < 4; i++)
@@ -41,7 +40,6 @@ public class PlayerManager : MonoBehaviour
             if(i > _amountOfPlayers - 1)
             {
                 _players[i].gameObject.SetActive(false);
-                _lineRenderers[i].SetActive(false);
             }
             foreach (ActivePlayer player in _activePlayers)
             {
@@ -62,12 +60,10 @@ public class PlayerManager : MonoBehaviour
         {
             if (_currentPlayer == _players[i])
             {
-                Debug.Log("The player that won is player " + i);
                 _victoryIndex = i + 1;
             }
         }
         OnGameEnded?.Invoke();
-        Debug.Log("Invoke");
         _gameHasEnded = true;
         yield return new WaitForSeconds(2f);
     }
@@ -76,7 +72,6 @@ public class PlayerManager : MonoBehaviour
         _activePlayers.Remove(playerToRemove);
         if (_activePlayers.Count == 1 && !_gameHasEnded)
         {
-            Debug.Log("End game");
             StartCoroutine(GameEnded());
         }
     }
@@ -91,6 +86,11 @@ public class PlayerManager : MonoBehaviour
             _currentPlayer = _activePlayers[_currentPlayerIndex];
             _mainCamera.ChangePlayer(_currentPlayer.transform);
             _currentPlayer.WeaponHolder.NewTurn();
+            _currentPlayer.SetIsActivePlayer(true);
+            foreach (ActivePlayer player in _activePlayers)
+            {
+                if(player != _currentPlayer) { player.SetIsActivePlayer(false); }
+            }
         }
     }
     public void FocusCamOnGrenade(Transform grenade)

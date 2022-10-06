@@ -9,7 +9,6 @@ public class WeaponProjectile : MonoBehaviour
     public void Initialize(int damage)
     {
         _damage = damage;
-        Debug.Log("Init " + transform.name);
     }
     private void Update()
     {

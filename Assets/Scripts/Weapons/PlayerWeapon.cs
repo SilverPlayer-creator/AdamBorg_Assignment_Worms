@@ -33,12 +33,13 @@ public class PlayerWeapon : MonoBehaviour
         if(_currentAmmo > 0)
         {
             GameObject projectile = ProjectilePooler.PoolInstance.SpawnFromPool(_data.WeaponName, _barrel.position, _data.Prefab.transform.rotation);
-            projectile.GetComponent<Rigidbody>().AddForce(_barrel.transform.forward * _data.Force);
+            Vector3 force = (_barrel.transform.forward * _data.ForwardForce) + (_barrel.transform.up * _data.UpwardForce);
+            projectile.GetComponent<Rigidbody>().AddForce(force);
             projectile.GetComponent<WeaponProjectile>().Initialize(_currentDamage);
             _nextShootTime = Time.time + 1f / _data.FireRate;
             _currentAmmo--;
             TurnManager.TurnInstance.DecreaseTimeRemaining(_data.TimeDecrease);
-            AudioManager.AudioInstance().PlaySound(_data.WeaponName);
+            AudioManager.Instance.PlaySound(_data.WeaponName);
         }
         else
             Reload();
@@ -51,7 +52,7 @@ public class PlayerWeapon : MonoBehaviour
             _holdingFire = false;
             _canFire = false;
             TurnManager.TurnInstance.QuickEnd();
-            AudioManager.AudioInstance().PlaySound("Reload");
+            AudioManager.Instance.PlaySound("Reload");
         }
     }
     public void PlayerTurn()
@@ -76,5 +77,6 @@ public class PlayerWeapon : MonoBehaviour
         _currentDamage += increasedDamage;
     }
     public GameObject GetPrefab => _data.Prefab;
-    public int GetForce => _data.Force;
+    public float GetForwardForce => _data.ForwardForce;
+    public float GetUpWardForce => _data.UpwardForce;
 }

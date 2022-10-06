@@ -6,28 +6,29 @@ using UnityEngine.InputSystem;
 
 public class TurnManager : MonoBehaviour
 {
+    [SerializeField] private float _maxTimeLimit;
+    [SerializeField] private Image _timeLimitImage;
     public delegate void TurnEnd(bool turnHasEnded);
     public event TurnEnd OnTurnEnding;
     public delegate void CountDown(int countDown);
     public event CountDown OnCountDown;
     public static TurnManager TurnInstance;
-    [SerializeField] private float _maxTimeLimit;
-    [SerializeField] private Image _timeLimitImage;
     private ActivePlayerWeapon _weaponInput;
     private float _timeToRoundStart = 1;
     private float _timeNotGrounded;
     private float _currentTimeLimit;
+    private float _newMaxTimeLimit;
     private bool _timeCanPass;
     private bool _turnIsEnding;
     private bool _playerHasDoneAction;
     private bool _roundHasStarted;
     private int _countDown = 5;
+    private int _turnsPassed;
     private void Awake()
     {
-        Debug.Log("Turn manager Awake");
         _currentTimeLimit = _maxTimeLimit;
         _roundHasStarted = false;
-
+        _newMaxTimeLimit = _maxTimeLimit;
         if (TurnInstance == null)
             TurnInstance = this;
         else
@@ -49,7 +50,7 @@ public class TurnManager : MonoBehaviour
         if (_timeCanPass)
         {
             _currentTimeLimit -= Time.deltaTime;
-            _timeLimitImage.fillAmount = (_currentTimeLimit / _maxTimeLimit);
+            _timeLimitImage.fillAmount = (_currentTimeLimit / _newMaxTimeLimit);
         }
         if (_currentTimeLimit <= 0 && !_turnIsEnding)
             StartCoroutine(EndCurrentTurn());
@@ -74,8 +75,14 @@ public class TurnManager : MonoBehaviour
     }
     void StartNewTurn()
     {
+        _turnsPassed++;
+        if(_turnsPassed >= 5 && _newMaxTimeLimit >= 8)
+        {
+            _newMaxTimeLimit--;
+            _turnsPassed = 0;
+        }
         _turnIsEnding = false;
-        _currentTimeLimit = _maxTimeLimit;
+        _currentTimeLimit = _newMaxTimeLimit;
         _playerHasDoneAction = false;
         _timeCanPass = true;
         InvokeTurnEnd(true);
@@ -106,7 +113,6 @@ public class TurnManager : MonoBehaviour
     {
         _roundHasStarted = true;
         _timeCanPass = true;
-        Debug.Log("Start round");
     }
     void CountDownUpdate()
     {

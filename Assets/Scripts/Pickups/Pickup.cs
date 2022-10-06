@@ -17,22 +17,22 @@ public class Pickup : MonoBehaviour
             {
                 case _typeOfPickup.health:
                     player.PlayerHealth.AddHealth(_value);
-                    AudioManager.AudioInstance().PlaySound("Health");
+                    AudioManager.Instance.PlaySound("Health");
                     break;
 
                 case _typeOfPickup.damage:
                     player.WeaponHolder.IncreaseDamage(_value);
-                    AudioManager.AudioInstance().PlaySound("DamagePick");
+                    AudioManager.Instance.PlaySound("DamagePick");
                     break;
 
                 case _typeOfPickup.grenade:
                     player.WeaponHolder.AddGrenades();
-                    AudioManager.AudioInstance().PlaySound("GrenadePick");
+                    AudioManager.Instance.PlaySound("GrenadePick");
                     break;
 
                 case _typeOfPickup.rocket:
                     player.WeaponHolder.AddWeapon("Rocket");
-                    AudioManager.AudioInstance().PlaySound("RocketPick");
+                    AudioManager.Instance.PlaySound("RocketPick");
                     break;
 
                 default:

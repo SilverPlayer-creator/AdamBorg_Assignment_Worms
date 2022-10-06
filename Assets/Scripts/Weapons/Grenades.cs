@@ -34,7 +34,6 @@ public class Grenades : MonoBehaviour
                 _exploded = true;
             }
         }
-        Debug.Log(GetComponent<Rigidbody>().velocity);
     }
     private void OnDrawGizmos()
     {
@@ -43,7 +42,7 @@ public class Grenades : MonoBehaviour
     private IEnumerator Explode()
     {
         _mesh.SetActive(false);
-        AudioManager.AudioInstance().PlaySound("GrenadeExp");
+        AudioManager.Instance.PlaySound("GrenadeExp");
         GameObject explosion = Instantiate(_explosion, transform.position, Quaternion.identity);
         Rigidbody body = GetComponent<Rigidbody>();
         body.velocity = Vector3.zero;

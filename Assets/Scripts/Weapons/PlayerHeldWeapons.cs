@@ -51,7 +51,7 @@ public class PlayerHeldWeapons : MonoBehaviour
                 _selectedWeapon.IsHoldingFire(false);
             }
         }
-        Vector3 force = _selectedWeapon.GetForce * transform.forward;
+        Vector3 force = (_selectedWeapon.GetForwardForce * _exit.forward) + (SelectedWeapon.GetUpWardForce * _exit.up);
         _trajectory.DrawTrajectory(force, _exit.position, _selectedWeapon.GetPrefab);
     }
     public void HoldingFire(bool holdingFire)
@@ -61,7 +61,10 @@ public class PlayerHeldWeapons : MonoBehaviour
     public void SingleFire()
     {
         if (!_selectedWeapon.WeaponIsAutomatic)
+        {
             _selectedWeapon.Shoot();
+            DisplayAmmo();
+        }
     }
     public void Reload()
     {
@@ -101,7 +104,7 @@ public class PlayerHeldWeapons : MonoBehaviour
         }
         if(_selectedWeaponIndex != currentSelectedWeaponIndex)
         {
-            AudioManager.AudioInstance().PlaySound("WeaponChange");
+            AudioManager.Instance.PlaySound("WeaponChange");
         }
         _activeWeaponImage.sprite = _selectedWeapon.Image;
         DisplayAmmo();
@@ -133,6 +136,7 @@ public class PlayerHeldWeapons : MonoBehaviour
         Rigidbody body = grenade.GetComponent<Rigidbody>();
         body.AddForce(transform.forward * _throwForce);
         _grenadeAmount--;
+        _canFire = false;
         DisplayAmmo();
     }
     public void IncreaseDamage(int increaseAmount)

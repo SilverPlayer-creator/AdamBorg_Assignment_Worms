@@ -20,13 +20,11 @@ public class GameUI : MonoBehaviour
     }
     void StartFadeIn()
     {
-        Debug.Log("Start fade in");
         StartCoroutine(FadeIn());
     }
     IEnumerator FadeIn()
     {
         _anim.SetTrigger("FadeIn");
-        Debug.Log("Fade in");
         foreach (GameObject item in _uiToTurnOff)
         {
             item.SetActive(false);
@@ -41,11 +39,11 @@ public class GameUI : MonoBehaviour
         if(countDown > 0)
         {
             _startText.text = "Round Starts In " + "\n" + countDown.ToString();
-            AudioManager.AudioInstance().PlaySound("CountDown");
+            AudioManager.Instance.PlaySound("CountDown");
         }
         else if(countDown <= 0 && !_roundStarted)
         {
-            AudioManager.AudioInstance().PlaySound("RoundStart");
+            AudioManager.Instance.PlaySound("RoundStart");
             StartCoroutine(RemoveText());
         }
     }

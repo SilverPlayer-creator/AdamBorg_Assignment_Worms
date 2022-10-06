@@ -11,7 +11,6 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("Audio manager Awake");
         if (_audioInstance == null)
         {
             _audioInstance = this;
@@ -22,10 +21,7 @@ public class AudioManager : MonoBehaviour
         }
         _source = GetComponent<AudioSource>();
     }
-    public static AudioManager AudioInstance()
-    {
-        return _audioInstance;
-    }
+    public static AudioManager Instance => _audioInstance;
     public void PlaySound(string soundName)
     {
         foreach (Sound sound in _sounds)

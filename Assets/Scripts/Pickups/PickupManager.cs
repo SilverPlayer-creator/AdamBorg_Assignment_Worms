@@ -75,7 +75,6 @@ public class PickupManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Random value was: " + randomValue + ", no spawn");
                 _chanceToSpawn -= 20;
             }
         }

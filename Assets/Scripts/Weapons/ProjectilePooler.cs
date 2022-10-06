@@ -42,7 +42,6 @@ public class ProjectilePooler : MonoBehaviour
     {
         if (!_poolDictionary.ContainsKey(tag))
         {
-            Debug.LogError("No object");
             return null;
         }
         GameObject objectToSpawn = _poolDictionary[tag].Dequeue();
