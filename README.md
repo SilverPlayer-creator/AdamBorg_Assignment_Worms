@@ -3,8 +3,8 @@
 FGP 2022 – Assignment #1, Local Multiplayer Shooter__
 By Adam Borg__
 __________________________________
-Basic Gameplay__
-The game is a third person shooter that will be playable by 2(two) to 4(four) different players, each taking their turn on the same machine.__
+Basic Gameplay<br />
+The game is a third person shooter that will be playable by 2(two) to 4(four) different players, each taking their turn on the same machine.<br />
 Each player has their own turn to move, while a timer counts down how much longer their turn lasts.__
 Firing their weapon will also decrease the amount of time the player has left.__ 
 Reloading or throwing a grenade will end the current players turn.__
