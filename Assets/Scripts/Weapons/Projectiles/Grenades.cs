@@ -15,7 +15,7 @@ public class Grenades : MonoBehaviour
     void Update()
     {
         _timer -= Time.deltaTime;
-        if(_timer <= 0)
+        if(_timer <= 0 && !_exploded)
         {
             Collider[] hitObjects = Physics.OverlapSphere(transform.position, _explosionRadius);
             List<ActivePlayerHealth> hitPlayers = new List<ActivePlayerHealth>();
@@ -24,15 +24,13 @@ public class Grenades : MonoBehaviour
                 ActivePlayerHealth player = collider.gameObject.GetComponent<ActivePlayerHealth>();
                 if(player != null && !hitPlayers.Contains(player))
                 {
+                    Debug.Log("Damage");
                     player.TakeDamage(_damage);
                     hitPlayers.Add(player);
                 }
             }
-            if (!_exploded)
-            {
-                StartCoroutine(Explode());
-                _exploded = true;
-            }
+            StartCoroutine(Explode());
+            _exploded = true;
         }
     }
     private void OnDrawGizmos()

@@ -13,7 +13,7 @@ public class SceneManagement : MonoBehaviour
     public void SetPlayerAmount(int playerAmount)
     {
         PlayerPrefs.SetInt("PlayerAmount", playerAmount);
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("MainScene");
     }
     public void QuitGame()
     {

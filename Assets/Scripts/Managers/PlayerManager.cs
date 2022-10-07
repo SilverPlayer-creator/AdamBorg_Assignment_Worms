@@ -10,6 +10,7 @@ public class PlayerManager : MonoBehaviour
     public event GameEnd OnGameEnded;
     public static PlayerManager Instance { get { return _instance; } }
     [SerializeField] private List<ActivePlayer> _players;
+    private List<ActivePlayer> _deadPlayers = new List<ActivePlayer>();
     [SerializeField] private CameraFollow _mainCamera;
     [SerializeField] private Transform _playerEndPosition;
     [SerializeField] private TurnManager _turnManager;
@@ -69,18 +70,25 @@ public class PlayerManager : MonoBehaviour
     }
     private void RemoveDeadPlayer(ActivePlayer playerToRemove)
     {
-        _activePlayers.Remove(playerToRemove);
-        if (_activePlayers.Count == 1 && !_gameHasEnded)
+        if (!_deadPlayers.Contains(playerToRemove))
+        {
+            _deadPlayers.Add(playerToRemove);
+        }
+        if (_deadPlayers.Count == _amountOfPlayers -1 && !_gameHasEnded)
         {
             StartCoroutine(GameEnded());
         }
     }
     private void ChangeActivePlayer(bool newTurn)
     {
+        Debug.Log("Current player index before changing: " + _currentPlayerIndex);
         if (newTurn)
         {
             if (_currentPlayerIndex < _activePlayers.Count - 1)
+            {
                 _currentPlayerIndex++;
+            }
+
             else
                 _currentPlayerIndex = 0;
             _currentPlayer = _activePlayers[_currentPlayerIndex];
@@ -92,6 +100,7 @@ public class PlayerManager : MonoBehaviour
                 if(player != _currentPlayer) { player.SetIsActivePlayer(false); }
             }
         }
+        Debug.Log("New player index: " + _currentPlayerIndex);
     }
     public void FocusCamOnGrenade(Transform grenade)
     {

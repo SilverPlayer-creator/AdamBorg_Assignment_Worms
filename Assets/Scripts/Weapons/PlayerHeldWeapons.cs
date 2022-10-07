@@ -159,6 +159,12 @@ public class PlayerHeldWeapons : MonoBehaviour
         _grenadeAmount += 2;
         DisplayAmmo();
     }
+    public void DisableInput()
+    {
+        _canFire = false;
+        _holdingFire = false;
+        _selectedWeapon.IsHoldingFire(false);
+    }
     void DisableUi()
     {
         _ammoText.gameObject.SetActive(false);

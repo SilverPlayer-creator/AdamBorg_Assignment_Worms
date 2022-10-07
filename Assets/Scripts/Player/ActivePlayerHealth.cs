@@ -38,6 +38,7 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     void Die()
     {
         OnPlayerDeath?.Invoke(_activePlayer);
+        GetComponent<PlayerHeldWeapons>().DisableInput();
         GameObject deathEffect = Instantiate(_deathEffect, transform.position, Quaternion.identity);
         _playerMesh.gameObject.SetActive(false);
         _playerUI.SetActive(false);
@@ -61,4 +62,5 @@ public class ActivePlayerHealth : MonoBehaviour, IDamageable
     {
         PlayerManager.Instance.OnGameEnded -= DisableUi;
     }
+    public bool HasDied => _hasDied;
 }

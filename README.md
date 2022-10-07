@@ -26,26 +26,30 @@ G Features<br />
 •Turn Based Game -Two players can play using the same input device (keyboard) taking turns.<br />
 •Terrain - Basic terrain using ProBuilder<br />
 •Player - A player controls one worm using the character controller, and has hit points.<br />
-•Camera - The camera follows the active player and follows when the player rotates.<br />
+•Camera - The camera follows the active player and follows when the player rotates. When a turn end the camera is told to focus on the next player.<br />
 •Weapon System - Using mouse one fires the main weapon and using mouse two makes the player throw a grenade (if it has one). Both use add force.<br />
 Besides all the G level features, the following VG features have been added:<br />
 •	(VG, Small) Add main menu (start) scene and game over scene<br />
--A main menu screen where you can select how many players there are and a screen when the game is over where you can select to play again, go to the main menu or quit the game.<br />
+-A main menu screen where you can select how many players there are with buttons and a screen when the game is over where you can select to play again, go to the main menu or quit the game.<br />
 -The amount of players is set with PlayerPrefs which the player manager references in the next scene to know how many players there are.<br />
+-Some last minute changes had to be roughly implemented, like changing the players turn when a player dies on their turn. The manager checks if the player in the list is dead or not.<br />
 •	(VG, Large) Support up to 4 players (using the same input device taking turns)<br />
 -All the movement is done with one manager that handles all the players and switches the active player when a turn is finished.<br />
 -The manager uses Unity's new input system and references the active player's character controller to move.<br />
 •	(VG, Small) A worm can only move a certain range<br />
--There is a timer that counts down when a turn starts. When the timer is finished, the current player’s turn ends.<br />
+-There is a timer that counts down when a turn starts. When the timer is finished, the current player’s turn ends. Throwing a grenade tells the turn manager to pause so the timer
+does not continue while waiting for the grenade to explode.<br />
 -The timer also decreases when a player fires a weapon. Weapons have a variable for how much to decrease the time with which is passed through to the turn manager when a weapon fires.<br />
 -After a certain amount of time has passed, the length of a turn decreases by one second, making the players have to think faster.<br />
 •	(VG, Small) A weapon can have ammo and needs to reload<br />
 -Different weapons have different amounts of ammo. If a weapon is reloaded the current player's turn ends.<br />
 •	(VG, Medium) The two types of weapons/attacks must function differently.<br />
 -The player can pick up a new weapon, switch between them with the mouse wheel and fire it with the left mouse button.<br />
+-The weapons are attached to the player object, but only one is active at first. When a weapon is picked up, if it's not active, it's set to active and added to a list of active weapons.<br /r>
 -The default weapon fires automatically and the projectiles only damage on impact with a player. The rocket you can pick up damages on impact and also in a radius around the impact.<br />
 -The two weapons have different ammo, fire types and damage. Both "spawn" projectiles using an object pooler to save resources.<br />
 •	(VG, Medium) Pickups<br />
 -Pickups can randomly spawn at the end of a player’s turn. Picking them up can either restore a player’s health, increase their damage, give them more grenades or a new weapon.<br />
 -A pickup manager holds a dictionary of vector3's and booleans. If a position spawns a pickup, it's value is set to false until the item is picked up.<br />
+-A pickup has an enum of what type it is and when a player picks it up a switch statement decides what happens based on what type it is.<br />
 I am aiming for VG (Väl godkänt) for this assignment.

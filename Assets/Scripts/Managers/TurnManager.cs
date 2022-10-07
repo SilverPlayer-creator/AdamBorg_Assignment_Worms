@@ -96,10 +96,6 @@ public class TurnManager : MonoBehaviour
         _playerHasDoneAction = true;
         _timeCanPass = false;
     }
-    private void OnDestroy()
-    {
-        _weaponInput.OnThrow -= StopTime;
-    }
     public void InvokeTurnEnd(bool hasEnded)
     {
         if(!PlayerManager.Instance.GameHasEnded)
@@ -143,5 +139,9 @@ public class TurnManager : MonoBehaviour
         {
             _timeNotGrounded = 0;
         }
+    }
+    private void OnDestroy()
+    {
+        _weaponInput.OnThrow -= StopTime;
     }
 }
